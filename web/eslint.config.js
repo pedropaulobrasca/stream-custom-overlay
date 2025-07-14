@@ -23,6 +23,7 @@ export default [
         document: 'readonly',
         console: 'readonly',
         process: 'readonly',
+        fetch: 'readonly',
       },
     },
     plugins: {
@@ -55,6 +56,7 @@ export default [
         document: 'readonly',
         console: 'readonly',
         process: 'readonly',
+        fetch: 'readonly',
       },
     },
   },
