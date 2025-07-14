@@ -14,7 +14,7 @@
     "build": "npm run build --workspace=api && npm run build --workspace=web",
     "build:api": "npm run build --workspace=api",
     "build:web": "npm run build --workspace=web",
-    "lint": "npm run lint --workspace=api && npm run lint --workspace=web",
+    "lint": "npm run lint --fix --workspace=api && npm run lint --fix --workspace=web",
     "test": "npm run test --workspace=api && npm run test --workspace=web"
   },
   "devDependencies": {
