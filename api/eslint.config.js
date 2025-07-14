@@ -13,6 +13,14 @@ export default [
       parserOptions: {
         project: './tsconfig.json',
       },
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        global: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tseslint,
