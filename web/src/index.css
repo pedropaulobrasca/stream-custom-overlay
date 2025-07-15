@@ -125,7 +125,7 @@
       linear-gradient(to right, oklch(0.922 0 0) 1px, transparent 1px),
       linear-gradient(to bottom, oklch(0.922 0 0) 1px, transparent 1px);
   }
-  
+
   @keyframes gradient-x {
     0%, 100% {
       background-position: 0% 0%;
@@ -134,7 +134,7 @@
       background-position: 100% 0%;
     }
   }
-  
+
   .animate-gradient-x {
     animation: gradient-x 3s ease infinite;
   }
