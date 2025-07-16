@@ -1,8 +1,8 @@
-import DashboardPage from "./pages/dashboard";
+import { AppRoutes } from "./routes";
 
 function App() {
   return (
-    <DashboardPage />
+    <AppRoutes />
   );
 }
 

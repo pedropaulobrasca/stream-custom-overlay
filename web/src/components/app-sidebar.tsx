@@ -23,6 +23,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { SparklesText } from "./magicui/sparkles-text";
 
 const data = {
   user: {
@@ -33,11 +34,16 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutDashboard,
     },
     {
       title: "Actions",
+      url: "/actions",
+      icon: List,
+    },
+    {
+      title: "Overlays",
       url: "#",
       icon: List,
     }
@@ -117,11 +123,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:!p-1.5 h-16"
             >
               <a href="#">
-                <Zap className="!size-5" />
-                <span className="text-base font-semibold">SCO.</span>
+                <SparklesText className="italic text-4xl">
+                  Overaction
+                </SparklesText>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
