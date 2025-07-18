@@ -41,10 +41,10 @@ export function ActionCard({ action, onEdit, onDelete }: ActionCardProps) {
       </CardHeader>
 
       <CardContent className="pb-3">
-        {action.image && (
+        {action.icon && (
           <div className="mb-3 rounded-md overflow-hidden">
             <img
-              src={action.image}
+              src={action.icon}
               alt={action.name}
               className="w-full h-32 object-cover"
             />
