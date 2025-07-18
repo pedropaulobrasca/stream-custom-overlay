@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { SparklesText } from "./magicui/sparkles-text";
 
+// Move data outside component to prevent recreation on each render
 const data = {
   user: {
     name: "Peeeuuuz",
@@ -115,7 +116,7 @@ const data = {
   ]
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -143,4 +144,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
     </Sidebar>
   );
-}
+});

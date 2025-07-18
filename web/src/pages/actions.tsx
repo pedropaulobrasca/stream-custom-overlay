@@ -1,10 +1,8 @@
-import { AppLayout } from "@/components/app-layout";
-
 function ActionsPage() {
   return (
-    <AppLayout>
+    <div className="flex flex-1 flex-col p-4">
       <h1>Actions list</h1>
-    </AppLayout>
+    </div>
   );
 }
 

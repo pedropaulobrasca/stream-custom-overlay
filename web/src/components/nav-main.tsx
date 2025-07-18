@@ -1,4 +1,6 @@
+import React from "react";
 import { PlusCircle, type LucideIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import {
   SidebarGroup,
@@ -8,7 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-export function NavMain({
+export const NavMain = React.memo(function NavMain({
   items,
 }: {
   items: {
@@ -33,17 +35,17 @@ export function NavMain({
         </SidebarMenu>
         <SidebarMenu>
           {items.map((item) => (
-            <a href={item.url}>
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton tooltip={item.title} className="cursor-pointer">
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton tooltip={item.title} className="cursor-pointer" asChild>
+                <Link to={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </a>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           ))}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
   );
-}
+});
