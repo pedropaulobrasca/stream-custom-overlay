@@ -47,7 +47,7 @@ const data = {
       title: "Overlays",
       url: "#",
       icon: List,
-    }
+    },
   ],
   navClouds: [
     {
@@ -113,7 +113,7 @@ const data = {
       url: "#",
       icon: Search,
     },
-  ]
+  ],
 };
 
 export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
