@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Plus, Search, Edit2, Trash2, MoreVertical } from "lucide-react";
-import { Action } from "@/types/action";
+import { useState, useEffect } from "react";
+import { Plus, Search, Edit2, Trash2, MoreVertical, Zap, Power, PowerOff } from "lucide-react";
+import { Action, CreateActionRequest } from "@/types/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -30,57 +30,35 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-// Mock data for demonstration
-const mockActions: Action[] = [
-  {
-    id: "1",
-    name: "Ban Collection",
-    description: "Temporarily bans resource collection",
-    cost: 5,
-    duration: 10,
-    icon: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=200&fit=crop",
-    isActive: true,
-    createdAt: new Date("2024-01-15"),
-    updatedAt: new Date("2024-01-15"),
-  },
-  {
-    id: "2",
-    name: "Slow Motion",
-    description: "Activates slow motion mode for limited time",
-    cost: 15,
-    duration: 5,
-    icon: "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=400&h=200&fit=crop",
-    isActive: true,
-    createdAt: new Date("2024-01-14"),
-    updatedAt: new Date("2024-01-14"),
-  },
-  {
-    id: "3",
-    name: "Coin Rain",
-    description: "Spawns extra coins on the map",
-    cost: 25,
-    duration: 15,
-    icon: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=200&fit=crop",
-    isActive: false,
-    createdAt: new Date("2024-01-13"),
-    updatedAt: new Date("2024-01-13"),
-  },
-  {
-    id: "4",
-    name: "Invert Controls",
-    description: "Inverts player controls",
-    cost: 10,
-    duration: 30,
-    isActive: true,
-    createdAt: new Date("2024-01-12"),
-    updatedAt: new Date("2024-01-12"),
-  },
-];
+import { CreateActionModal } from "@/components/actions/create-action-modal";
+import { useActionsStore } from "@/stores/actions-store";
+import { getActionTypeLabel } from "@/data/mock-actions";
+import { toast } from "sonner";
 
 function ActionsPage() {
-  const [actions, setActions] = useState<Action[]>(mockActions);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const {
+    actions,
+    error,
+    fetchActions,
+    createAction,
+    deleteAction,
+    toggleAction,
+    clearError,
+  } = useActionsStore();
+
+  useEffect(() => {
+    fetchActions();
+  }, [fetchActions]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      clearError();
+    }
+  }, [error, clearError]);
 
   const filteredActions = actions.filter(action =>
     action.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,13 +70,32 @@ function ActionsPage() {
     // TODO: Implement edit modal
   };
 
-  const handleDelete = (id: string) => {
-    setActions(prev => prev.filter(action => action.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteAction(id);
+      toast.success("Action deleted successfully");
+    } catch {
+      toast.error("Failed to delete action");
+    }
   };
 
-  const handleCreateNew = () => {
-    console.log("Create new action");
-    // TODO: Implement create modal
+  const handleToggle = async (id: string) => {
+    try {
+      await toggleAction(id);
+      toast.success("Action status updated");
+    } catch {
+      toast.error("Failed to update action status");
+    }
+  };
+
+  const handleCreateAction = async (data: CreateActionRequest) => {
+    try {
+      await createAction(data);
+      toast.success("Action created successfully");
+    } catch (error) {
+      toast.error("Failed to create action");
+      throw error;
+    }
   };
 
   return (
@@ -110,7 +107,7 @@ function ActionsPage() {
             Manage actions that viewers can activate with bits
           </p>
         </div>
-        <Button onClick={handleCreateNew}>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           New Action
         </Button>
@@ -132,7 +129,7 @@ function ActionsPage() {
             {searchTerm ? "No actions found" : "No actions created yet"}
           </div>
           {!searchTerm && (
-            <Button onClick={handleCreateNew} variant="outline">
+            <Button onClick={() => setIsCreateModalOpen(true)} variant="outline">
               <Plus className="h-4 w-4 mr-2" />
               Create first action
             </Button>
@@ -143,11 +140,10 @@ function ActionsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">Icon</TableHead>
+                <TableHead className="w-16">Image</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead className="w-24">Cost</TableHead>
-                <TableHead className="w-24">Duration</TableHead>
+                <TableHead className="w-24">Type</TableHead>
                 <TableHead className="w-24">Status</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
@@ -156,25 +152,30 @@ function ActionsPage() {
               {filteredActions.map((action) => (
                 <TableRow key={action.id}>
                   <TableCell>
-                    {action.icon ? (
+                    {action.image ? (
                       <img
-                        src={action.icon}
+                        src={action.image}
                         alt={action.name}
                         className="h-8 w-8 rounded object-cover"
                       />
                     ) : (
-                      <div className="h-8 w-8 rounded bg-muted" />
+                      <div className="flex items-center justify-center h-8 w-8 rounded bg-muted">
+                        <Zap className="h-4 w-4" />
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="font-medium">{action.name}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {action.description}
                   </TableCell>
-                  <TableCell>{action.cost} bits</TableCell>
-                  <TableCell>{action.duration} min</TableCell>
                   <TableCell>
-                    <Badge variant={action.isActive ? "default" : "secondary"}>
-                      {action.isActive ? "Active" : "Inactive"}
+                    <Badge variant="outline">
+                      {getActionTypeLabel(action.type)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={action.enabled ? "default" : "secondary"}>
+                      {action.enabled ? "Enabled" : "Disabled"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -186,6 +187,14 @@ function ActionsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleToggle(action.id)}>
+                          {action.enabled ? (
+                            <PowerOff className="mr-2 h-4 w-4" />
+                          ) : (
+                            <Power className="mr-2 h-4 w-4" />
+                          )}
+                          {action.enabled ? "Disable" : "Enable"}
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleEdit(action)}>
                           <Edit2 className="mr-2 h-4 w-4" />
                           Edit
@@ -227,6 +236,12 @@ function ActionsPage() {
           </Table>
         </div>
       )}
+
+      <CreateActionModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onSubmit={handleCreateAction}
+      />
     </div>
   );
 }

@@ -5,16 +5,16 @@ import { useLocation } from "react-router-dom";
 
 export function SiteHeader() {
   const location = useLocation();
-  
+
   const getPageTitle = () => {
     switch (location.pathname) {
-      case "/":
-      case "/dashboard":
-        return "Dashboard";
-      case "/actions":
-        return "Actions";
-      default:
-        return "Dashboard";
+    case "/":
+    case "/dashboard":
+      return "Dashboard";
+    case "/actions":
+      return "Actions";
+    default:
+      return "Dashboard";
     }
   };
 

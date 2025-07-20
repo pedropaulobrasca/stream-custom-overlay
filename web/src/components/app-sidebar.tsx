@@ -5,7 +5,6 @@ import {
   FileText,
   FileText as FileDescription,
   HelpCircle,
-  Zap,
   List,
   Search,
   Settings,
