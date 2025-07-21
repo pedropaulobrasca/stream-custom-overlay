@@ -1,5 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/app-layout";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import LandingPage from "./pages/landing";
+import LoginPage from "./pages/login";
+import AuthCallbackPage from "./pages/auth-callback";
 import DashboardPage from "./pages/dashboard";
 import ActionsPage from "./pages/actions";
 import OverlaysPage from "./pages/overlays";
@@ -9,8 +13,14 @@ import TestPanelPage from "./pages/test-panel";
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<AppLayout />}>
-        <Route index element={<DashboardPage />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path="/" element={
+        <ProtectedRoute>
+          <AppLayout />
+        </ProtectedRoute>
+      }>
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="actions" element={<ActionsPage />} />
         <Route path="overlays" element={<OverlaysPage />} />

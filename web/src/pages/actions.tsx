@@ -33,6 +33,7 @@ import {
 import { CreateActionModal } from "@/components/actions/create-action-modal";
 import { useActionsStore } from "@/stores/actions-store";
 import { getActionTypeLabel } from "@/data/mock-actions";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { toast } from "sonner";
 
 function ActionsPage() {
@@ -99,7 +100,8 @@ function ActionsPage() {
   };
 
   return (
-    <div className="flex flex-1 flex-col p-6">
+    <ProtectedRoute>
+      <div className="flex flex-1 flex-col p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Stream Actions</h1>
@@ -242,7 +244,8 @@ function ActionsPage() {
         onOpenChange={setIsCreateModalOpen}
         onSubmit={handleCreateAction}
       />
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }
 
