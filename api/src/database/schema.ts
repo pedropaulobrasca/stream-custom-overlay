@@ -3,7 +3,7 @@ import { createId } from '@paralleldrive/cuid2';
 
 // Users table - stores Twitch user data
 export const users = pgTable('users', {
-  id: uuid('id').primaryKey().$defaultFn(() => createId()),
+  id: text('id').primaryKey().$defaultFn(() => createId()),
   twitchId: text('twitch_id').unique().notNull(),
   username: text('username').notNull(),
   displayName: text('display_name').notNull(),
@@ -17,8 +17,8 @@ export const users = pgTable('users', {
 
 // User sessions table - for managing active sessions
 export const userSessions = pgTable('user_sessions', {
-  id: uuid('id').primaryKey().$defaultFn(() => createId()),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  id: text('id').primaryKey().$defaultFn(() => createId()),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   token: text('token').unique().notNull(),
   refreshToken: text('refresh_token'),
   expiresAt: timestamp('expires_at').notNull(),
@@ -28,8 +28,8 @@ export const userSessions = pgTable('user_sessions', {
 
 // Actions table - stores user-defined actions
 export const actions = pgTable('actions', {
-  id: uuid('id').primaryKey().$defaultFn(() => createId()),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  id: text('id').primaryKey().$defaultFn(() => createId()),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   name: text('name').notNull(),
   description: text('description'),
   type: text('type').notNull(), // 'sound', 'text', 'image', 'video', etc.
@@ -42,8 +42,8 @@ export const actions = pgTable('actions', {
 
 // Overlays table - stores overlay configurations
 export const overlays = pgTable('overlays', {
-  id: uuid('id').primaryKey().$defaultFn(() => createId()),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  id: text('id').primaryKey().$defaultFn(() => createId()),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   name: text('name').notNull(),
   description: text('description'),
   game: text('game'), // e.g., 'albion-online', 'twitch-chat', etc.
@@ -56,8 +56,8 @@ export const overlays = pgTable('overlays', {
 
 // Events table - stores system events and user interactions
 export const events = pgTable('events', {
-  id: uuid('id').primaryKey().$defaultFn(() => createId()),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => createId()),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
   type: text('type').notNull(), // 'action_triggered', 'overlay_viewed', 'user_login', etc.
   source: text('source'), // 'twitch', 'overlay', 'api', etc.
   data: jsonb('data'), // Event-specific data
@@ -67,8 +67,8 @@ export const events = pgTable('events', {
 
 // Twitch integrations table - stores Twitch-specific data
 export const twitchIntegrations = pgTable('twitch_integrations', {
-  id: uuid('id').primaryKey().$defaultFn(() => createId()),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  id: text('id').primaryKey().$defaultFn(() => createId()),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   accessToken: text('access_token').notNull(),
   refreshToken: text('refresh_token').notNull(),
   expiresAt: timestamp('expires_at').notNull(),
