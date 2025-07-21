@@ -4,6 +4,7 @@ import DashboardPage from "./pages/dashboard";
 import ActionsPage from "./pages/actions";
 import OverlaysPage from "./pages/overlays";
 import OverlayPage from "./pages/overlay";
+import TestPanelPage from "./pages/test-panel";
 
 export function AppRoutes() {
   return (
@@ -13,8 +14,9 @@ export function AppRoutes() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="actions" element={<ActionsPage />} />
         <Route path="overlays" element={<OverlaysPage />} />
+        <Route path="test-panel" element={<TestPanelPage />} />
       </Route>
-      <Route path="/overlay/:game" element={<OverlayPage />} />
+      <Route path="/overlay/:userId/:game" element={<OverlayPage />} />
     </Routes>
   );
 }

@@ -8,6 +8,7 @@ import {
   List,
   Search,
   Settings,
+  TestTube,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -46,6 +47,11 @@ const data = {
       title: "Overlays",
       url: "/overlays",
       icon: List,
+    },
+    {
+      title: "Test Panel",
+      url: "/test-panel",
+      icon: TestTube,
     },
   ],
   navClouds: [

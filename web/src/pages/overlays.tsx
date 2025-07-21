@@ -17,16 +17,21 @@ interface Overlay {
   game: string;
   status: "active" | "inactive";
   url: string;
+  userId: string;
   createdAt: string;
 }
 
 export default function OverlaysPage() {
+  // Simulated user ID - in a real app this would come from authentication
+  const userId = "user_123abc";
+  
   const [overlays] = useState<Overlay[]>([
     {
       id: "1",
       game: "Albion Online",
       status: "active",
-      url: `${window.location.origin}/overlay/albion`,
+      url: `${window.location.origin}/overlay/${userId}/albion`,
+      userId: userId,
       createdAt: "2024-01-15",
     },
   ]);
