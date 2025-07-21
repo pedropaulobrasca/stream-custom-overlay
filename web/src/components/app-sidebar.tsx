@@ -24,14 +24,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { SparklesText } from "./magicui/sparkles-text";
+import { useAuth } from "@/contexts/AuthContext";
 
-// Move data outside component to prevent recreation on each render
-const data = {
-  user: {
-    name: "Peeeuuuz",
-    email: "pedropaulobrasca@gmail.com",
-    avatar: "https://github.com/pedropaulobrasca.png",
-  },
+// Move navigation data outside component to prevent recreation on each render
+const navigationData = {
   navMain: [
     {
       title: "Dashboard",
@@ -122,6 +118,19 @@ const data = {
 };
 
 export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth();
+
+  // Create user data for NavUser component
+  const userData = user ? {
+    name: user.displayName || user.username,
+    email: `@${user.username}`,
+    avatar: user.profileImage
+  } : {
+    name: "Loading...",
+    email: "",
+    avatar: ""
+  };
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -141,11 +150,11 @@ export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.Com
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={navigationData.navMain} />
+        <NavSecondary items={navigationData.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   );
