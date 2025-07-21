@@ -15,6 +15,7 @@ interface ActionConfigFormProps {
   type: ActionType;
   value: ActionConfig;
   onChange: (config: ActionConfig) => void;
+  errors?: any;
 }
 
 export function ActionConfigForm({ type, value, onChange }: ActionConfigFormProps) {
@@ -22,51 +23,13 @@ export function ActionConfigForm({ type, value, onChange }: ActionConfigFormProp
     onChange({
       ...value,
       [key]: {
-        ...value[key as keyof ActionConfig],
+        ...(value[key as keyof ActionConfig] || {}),
         ...configValue,
       },
     });
   };
 
   switch (type) {
-  case ActionType.SOUND:
-    return (
-      <div className="space-y-4">
-        <h4 className="text-sm font-medium">Sound Configuration</h4>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="sound-file">Sound File Path</Label>
-            <Input
-              id="sound-file"
-              placeholder="/sounds/example.mp3"
-              value={value.soundConfig?.filePath || ""}
-              onChange={(e) => updateConfig("soundConfig", { filePath: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="sound-volume">Volume (0-1)</Label>
-            <Input
-              id="sound-volume"
-              type="number"
-              min="0"
-              max="1"
-              step="0.1"
-              placeholder="0.8"
-              value={value.soundConfig?.volume || ""}
-              onChange={(e) => updateConfig("soundConfig", { volume: parseFloat(e.target.value) || 0 })}
-            />
-          </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Switch
-            checked={value.soundConfig?.loop || false}
-            onCheckedChange={(checked: boolean) => updateConfig("soundConfig", { loop: checked })}
-          />
-          <Label>Loop sound</Label>
-        </div>
-      </div>
-    );
-
   case ActionType.OVERLAY:
     return (
       <div className="space-y-4">
@@ -87,8 +50,8 @@ export function ActionConfigForm({ type, value, onChange }: ActionConfigFormProp
               id="overlay-duration"
               type="number"
               placeholder="5000"
-              value={value.overlayConfig?.duration || ""}
-              onChange={(e) => updateConfig("overlayConfig", { duration: parseInt(e.target.value) || 0 })}
+              value={value.overlayConfig?.duration?.toString() || ""}
+              onChange={(e) => updateConfig("overlayConfig", { duration: parseInt(e.target.value) || 5000 })}
             />
           </div>
           <div className="space-y-2">
@@ -115,11 +78,11 @@ export function ActionConfigForm({ type, value, onChange }: ActionConfigFormProp
               id="overlay-font-size"
               type="number"
               placeholder="24"
-              value={value.overlayConfig?.style?.fontSize || ""}
+              value={value.overlayConfig?.style?.fontSize?.toString() || ""}
               onChange={(e) => updateConfig("overlayConfig", {
                 style: {
-                  ...value.overlayConfig?.style,
-                  fontSize: parseInt(e.target.value) || 16,
+                  ...(value.overlayConfig?.style || {}),
+                  fontSize: parseInt(e.target.value) || 24,
                 },
               })}
             />
@@ -132,7 +95,7 @@ export function ActionConfigForm({ type, value, onChange }: ActionConfigFormProp
               value={value.overlayConfig?.style?.color || "#ffffff"}
               onChange={(e) => updateConfig("overlayConfig", {
                 style: {
-                  ...value.overlayConfig?.style,
+                  ...(value.overlayConfig?.style || {}),
                   color: e.target.value,
                 },
               })}
@@ -146,7 +109,7 @@ export function ActionConfigForm({ type, value, onChange }: ActionConfigFormProp
               value={value.overlayConfig?.style?.backgroundColor || "#000000"}
               onChange={(e) => updateConfig("overlayConfig", {
                 style: {
-                  ...value.overlayConfig?.style,
+                  ...(value.overlayConfig?.style || {}),
                   backgroundColor: e.target.value,
                 },
               })}

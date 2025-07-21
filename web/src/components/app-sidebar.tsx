@@ -44,7 +44,7 @@ const data = {
     },
     {
       title: "Overlays",
-      url: "#",
+      url: "/overlays",
       icon: List,
     },
   ],

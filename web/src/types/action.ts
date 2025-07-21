@@ -11,7 +11,6 @@ export interface Action {
 }
 
 export enum ActionType {
-  SOUND = "sound",
   OVERLAY = "overlay",
   CHAT = "chat",
   SCENE = "scene",
@@ -20,18 +19,11 @@ export enum ActionType {
 }
 
 export interface ActionConfig {
-  soundConfig?: SoundConfig;
   overlayConfig?: OverlayConfig;
   chatConfig?: ChatConfig;
   sceneConfig?: SceneConfig;
   mediaConfig?: MediaConfig;
   webhookConfig?: WebhookConfig;
-}
-
-export interface SoundConfig {
-  filePath: string;
-  volume: number;
-  loop: boolean;
 }
 
 export interface OverlayConfig {
