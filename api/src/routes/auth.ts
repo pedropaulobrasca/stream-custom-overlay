@@ -2,12 +2,14 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { TwitchService } from "../services/twitch";
-import { JWT_CONFIG } from "../config/twitch";
+import { UserService } from "../services/user";
+import { JWT_CONFIG, TWITCH_CONFIG } from "../config/twitch";
 import { JWTPayload, AuthenticatedRequest } from "../types/auth";
 import { authenticateToken } from "../middleware/auth";
 
 const router = express.Router();
 const twitchService = TwitchService.getInstance();
+const userService = UserService.getInstance();
 
 // In-memory store for state tokens (in production, use Redis)
 const stateStore = new Map<string, { timestamp: number }>();
@@ -55,16 +57,29 @@ router.post("/callback", async (req, res) => {
     // Exchange code for tokens
     const tokens = await twitchService.exchangeCodeForTokens(code);
 
-    // Get user info
+    // Get user info from Twitch
     const twitchUser = await twitchService.getUserInfo(tokens.access_token);
+
+    // Create or update user in database
+    const user = await userService.createOrUpdateFromTwitch(twitchUser);
+
+    // Store Twitch integration data
+    const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
+    await userService.storeTwitchIntegration(
+      user.id,
+      tokens.access_token,
+      tokens.refresh_token,
+      expiresAt,
+      TWITCH_CONFIG.SCOPES
+    );
 
     // Create JWT payload
     const payload: JWTPayload = {
-      userId: `twitch_${twitchUser.id}`,
-      twitchId: twitchUser.id,
-      username: twitchUser.login,
-      displayName: twitchUser.display_name,
-      profileImage: twitchUser.profile_image_url,
+      userId: user.id,
+      twitchId: user.twitchId,
+      username: user.username,
+      displayName: user.displayName,
+      profileImage: user.profileImage,
     };
 
     // Generate JWT
@@ -72,8 +87,8 @@ router.post("/callback", async (req, res) => {
       expiresIn: JWT_CONFIG.EXPIRES_IN,
     } as jwt.SignOptions);
 
-    // Store refresh token (in production, use secure database)
-    // For now, we'll include it in the response for frontend to handle securely
+    // Store user session
+    await userService.createSession(user.id, jwtToken, tokens.refresh_token, expiresAt);
 
     res.json({
       token: jwtToken,

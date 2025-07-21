@@ -10,6 +10,9 @@ import sseRouter from "./routes/sse";
 import authRouter from "./routes/auth";
 import twitchRouter from "./routes/twitch";
 import webhooksRouter from "./routes/webhooks";
+import actionsRouter from "./routes/actions";
+import overlaysRouter from "./routes/overlays";
+import { testDatabaseConnection } from "./database/connection";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -45,6 +48,18 @@ app.use("/api/sse", sseRouter);
 // Webhooks API
 app.use("/api/webhooks", webhooksRouter);
 
-app.listen(PORT, () => {
+// Actions API
+app.use("/api/actions", actionsRouter);
+
+// Overlays API
+app.use("/api/overlays", overlaysRouter);
+
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // Test database connection on startup
+  const dbConnected = await testDatabaseConnection();
+  if (!dbConnected) {
+    console.warn("⚠️  Server started but database connection failed. Some features may not work.");
+  }
 });

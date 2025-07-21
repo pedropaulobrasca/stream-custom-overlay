@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { Action, CreateActionRequest, UpdateActionRequest } from "@/types/action";
-import { mockActions } from "@/data/mock-actions";
+import { api } from "@/lib/api";
 
 interface ActionsState {
   actions: Action[];
@@ -17,8 +17,6 @@ interface ActionsState {
   clearError: () => void;
 }
 
-const delay = (ms: number) => new Promise(resolve => window.setTimeout(resolve, ms));
-
 export const useActionsStore = create<ActionsState>()(
   devtools(
     (set, get) => ({
@@ -29,8 +27,13 @@ export const useActionsStore = create<ActionsState>()(
       fetchActions: async () => {
         set({ isLoading: true, error: null });
         try {
-          await delay(500);
-          set({ actions: mockActions, isLoading: false });
+          const response = await api.get('/actions');
+          const actions = response.data.map((action: any) => ({
+            ...action,
+            enabled: action.isActive,
+            image: null, // Backend doesn't support image URLs yet
+          }));
+          set({ actions, isLoading: false });
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : "Failed to fetch actions",
@@ -42,14 +45,11 @@ export const useActionsStore = create<ActionsState>()(
       createAction: async (data: CreateActionRequest) => {
         set({ isLoading: true, error: null });
         try {
-          await delay(800);
-
-          const newAction: Action = {
-            id: Math.random().toString(36).substr(2, 9),
-            ...data,
-            enabled: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+          const response = await api.post('/actions', data);
+          const newAction = {
+            ...response.data,
+            enabled: response.data.isActive,
+            image: null,
           };
 
           set(state => ({
@@ -68,13 +68,16 @@ export const useActionsStore = create<ActionsState>()(
       updateAction: async (data: UpdateActionRequest) => {
         set({ isLoading: true, error: null });
         try {
-          await delay(500);
+          const response = await api.put(`/actions/${data.id}`, data);
+          const updatedAction = {
+            ...response.data,
+            enabled: response.data.isActive,
+            image: null,
+          };
 
           set(state => ({
             actions: state.actions.map(action =>
-              action.id === data.id
-                ? { ...action, ...data, updatedAt: new Date().toISOString() }
-                : action,
+              action.id === data.id ? updatedAction : action,
             ),
             isLoading: false,
           }));
@@ -90,7 +93,7 @@ export const useActionsStore = create<ActionsState>()(
       deleteAction: async (id: string) => {
         set({ isLoading: true, error: null });
         try {
-          await delay(300);
+          await api.delete(`/actions/${id}`);
 
           set(state => ({
             actions: state.actions.filter(action => action.id !== id),
@@ -111,13 +114,16 @@ export const useActionsStore = create<ActionsState>()(
 
         set({ isLoading: true, error: null });
         try {
-          await delay(300);
+          const response = await api.patch(`/actions/${id}/toggle`);
+          const updatedAction = {
+            ...response.data,
+            enabled: response.data.isActive,
+            image: null,
+          };
 
           set(state => ({
             actions: state.actions.map(action =>
-              action.id === id
-                ? { ...action, enabled: !action.enabled, updatedAt: new Date().toISOString() }
-                : action,
+              action.id === id ? updatedAction : action,
             ),
             isLoading: false,
           }));
