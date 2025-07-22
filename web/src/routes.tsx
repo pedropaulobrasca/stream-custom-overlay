@@ -26,7 +26,7 @@ export function AppRoutes() {
         <Route path="overlays" element={<OverlaysPage />} />
         <Route path="test-panel" element={<TestPanelPage />} />
       </Route>
-      <Route path="/overlay/:userId/:game" element={<OverlayPage />} />
+      <Route path="/overlay/:userId/:overlayId" element={<OverlayPage />} />
     </Routes>
   );
 }

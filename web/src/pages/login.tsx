@@ -30,7 +30,7 @@ function LoginPage() {
           
           <div className="flex items-center space-x-2 mb-2">
             <Monitor className="h-8 w-8 text-primary" />
-            <span className="font-bold text-2xl">Stream Custom Overlay</span>
+            <span className="font-bold text-2xl">Overaction</span>
           </div>
         </div>
 
@@ -53,7 +53,7 @@ function LoginPage() {
         </Card>
 
         <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>New to Stream Custom Overlay?</p>
+          <p>New to Overaction?</p>
           <p className="mt-1">
             Sign in with your Twitch account to get started and unlock all features.
           </p>

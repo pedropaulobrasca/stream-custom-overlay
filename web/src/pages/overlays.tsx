@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -11,49 +10,51 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Copy, Edit, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-
-interface Overlay {
-  id: string;
-  game: string;
-  status: "active" | "inactive";
-  url: string;
-  userId: string;
-  createdAt: string;
-}
+import { useOverlays } from "@/hooks/useOverlays";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function OverlaysPage() {
-  // Simulated user ID - in a real app this would come from authentication
-  const userId = "user_123abc";
-  
-  const [overlays] = useState<Overlay[]>([
-    {
-      id: "1",
-      game: "Albion Online",
-      status: "active",
-      url: `${window.location.origin}/overlay/${userId}/albion`,
-      userId: userId,
-      createdAt: "2024-01-15",
-    },
-  ]);
+  const { user } = useAuth();
+  const { overlays, loading, error } = useOverlays();
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const copyToClipboard = (overlayId: string) => {
+    const url = `${window.location.origin}/overlay/${user?.userId}/${overlayId}`;
+    navigator.clipboard.writeText(url);
     toast.success("URL copied to clipboard");
   };
 
-  const handleEdit = (overlay: Overlay) => {
-    // TODO: Implement edit functionality
+  const handleEdit = (overlay: any) => {
     toast.info("Edit functionality coming soon");
   };
 
-  const handleDelete = (overlay: Overlay) => {
-    // TODO: Implement delete functionality
+  const handleDelete = (overlay: any) => {
     toast.info("Delete functionality coming soon");
   };
 
-  const openOverlay = (url: string) => {
+  const openOverlay = (overlayId: string) => {
+    const url = `${window.location.origin}/overlay/${user?.userId}/${overlayId}`;
     window.open(url, "_blank");
   };
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">Loading overlays...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-destructive">Error loading overlays: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -69,77 +70,91 @@ export default function OverlaysPage() {
         </Button>
       </div>
 
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Game</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>URL</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {overlays.map((overlay) => (
-              <TableRow key={overlay.id}>
-                <TableCell className="font-medium">{overlay.game}</TableCell>
-                <TableCell>
-                  <Badge 
-                    variant={overlay.status === "active" ? "default" : "secondary"}
-                  >
-                    {overlay.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <code className="text-sm bg-muted px-2 py-1 rounded truncate w-full">
-                      {overlay.url}
-                    </code>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => copyToClipboard(overlay.url)}
-                      className="h-8 w-8"
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => openOverlay(overlay.url)}
-                      className="h-8 w-8"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell>{overlay.createdAt}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(overlay)}
-                      className="h-8 w-8"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(overlay)}
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+      {overlays.length === 0 ? (
+        <div className="border rounded-lg p-8 text-center">
+          <p className="text-muted-foreground mb-4">No overlays available yet.</p>
+          <p className="text-sm text-muted-foreground">
+            Create your first action to automatically generate an Albion Online overlay.
+          </p>
+        </div>
+      ) : (
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Game</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>URL</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {overlays.map((overlay) => {
+                const overlayUrl = `${window.location.origin}/overlay/${user?.userId}/${overlay.id}`;
+                const formattedDate = new Date(overlay.createdAt).toLocaleDateString();
+                
+                return (
+                  <TableRow key={overlay.id}>
+                    <TableCell className="font-medium">{overlay.name}</TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant={overlay.isActive ? "default" : "secondary"}
+                      >
+                        {overlay.isActive ? "active" : "inactive"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <code className="text-sm bg-muted px-2 py-1 rounded truncate max-w-xs">
+                          {overlayUrl}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyToClipboard(overlay.id)}
+                          className="h-8 w-8"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openOverlay(overlay.id)}
+                          className="h-8 w-8"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>{formattedDate}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(overlay)}
+                          className="h-8 w-8"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(overlay)}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }

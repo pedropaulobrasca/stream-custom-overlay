@@ -1,15 +1,18 @@
 import { SparklesText } from "@/components/magicui/sparkles-text";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { api } from "@/lib/api";
 
 interface Action {
   id: string;
   name: string;
   description: string;
-  image: string;
-  bitCost: number;
-  enabled: boolean;
-  durationMinutes: number; // Duration in minutes when activated
+  config: {
+    emoji: string;
+    bitCost: number;
+    duration: number;
+  };
+  isActive: boolean;
 }
 
 interface TestEvent {
@@ -38,80 +41,62 @@ interface ActionTimer {
 }
 
 export default function OverlayPage() {
-  const { userId, game } = useParams<{ userId: string; game: string }>();
+  const { userId, overlayId } = useParams<{ userId: string; overlayId: string }>();
   const [actions, setActions] = useState<Action[]>([]);
   const [triggeredActions, setTriggeredActions] = useState<TriggeredAction[]>([]);
   const [recentEvents, setRecentEvents] = useState<TestEvent[]>([]);
   const [actionTimers, setActionTimers] = useState<Record<string, ActionTimer>>({});
 
+  // Fetch actions from API and overlay data
   useEffect(() => {
-    // Mock data for Albion Online actions based on the image
-    // In a real app, this would fetch user-specific actions by userId
-    if (game === "albion" && userId) {
-      setActions([
-        {
-          id: "1",
-          name: "Block Wood Collection",
-          description: "Block wood collection for duration",
-          image: "🪓",
-          bitCost: 139,
-          enabled: true,
-          durationMinutes: 10,
-        },
-        {
-          id: "2",
-          name: "Block Stone Collection",
-          description: "Block stone collection for duration",
-          image: "⛏️",
-          bitCost: 85,
-          enabled: true,
-          durationMinutes: 8,
-        },
-        {
-          id: "3",
-          name: "Block Ore Collection",
-          description: "Block ore collection for duration",
-          image: "⚒️",
-          bitCost: 13,
-          enabled: true,
-          durationMinutes: 3,
-        },
-        {
-          id: "4",
-          name: "Block Fiber Collection",
-          description: "Block fiber collection for duration",
-          image: "🌾",
-          bitCost: 65,
-          enabled: true,
-          durationMinutes: 6,
-        },
-        {
-          id: "5",
-          name: "Block Hide Collection",
-          description: "Block hide collection for duration",
-          image: "🦌",
-          bitCost: 25,
-          enabled: true,
-          durationMinutes: 4,
-        },
-      ]);
+    const fetchActionsAndOverlay = async () => {
+      if (!userId || !overlayId) return;
 
-      // Initialize timers for each action
-      const initialTimers: Record<string, ActionTimer> = {};
-      ["1", "2", "3", "4", "5"].forEach(id => {
-        initialTimers[id] = {
-          actionId: id,
-          isActive: false,
-          activatedAt: null,
-          endsAt: null,
-          remainingSeconds: 0,
-          triggeredBy: "",
-          bitsReceived: 0,
-        };
-      });
-      setActionTimers(initialTimers);
-    }
-  }, [userId, game]);
+      try {
+        // Get specific overlay by ID (public route, no auth needed)
+        const overlayResponse = await fetch(`/api/overlays/public/${overlayId}`);
+        if (!overlayResponse.ok) {
+          throw new Error('Failed to fetch overlay');
+        }
+        const overlay = await overlayResponse.json();
+
+        if (overlay) {
+          // Get actions for this overlay using the public route
+          const actionsResponse = await fetch(`/api/overlays/public/${overlayId}/actions`);
+          if (!actionsResponse.ok) {
+            throw new Error('Failed to fetch overlay actions');
+          }
+          const overlayActions = await actionsResponse.json();
+
+          console.log('Loaded overlay actions:', overlayActions);
+          setActions(overlayActions);
+
+          // Initialize timers for each action
+          const initialTimers: Record<string, ActionTimer> = {};
+          overlayActions.forEach((action: any) => {
+            initialTimers[action.id] = {
+              actionId: action.id,
+              isActive: false,
+              activatedAt: null,
+              endsAt: null,
+              remainingSeconds: 0,
+              triggeredBy: "",
+              bitsReceived: 0,
+            };
+          });
+          setActionTimers(initialTimers);
+        } else {
+          console.log('No overlay found or no actions in overlay:', overlayId);
+          setActions([]);
+        }
+      } catch (error) {
+        console.error('Error fetching overlay actions:', error);
+        setActions([]);
+      }
+    };
+
+    fetchActionsAndOverlay();
+  }, [userId, overlayId]);
 
   // Function to process events (used by multiple sources)
   const processEvents = (events: any[]) => {
@@ -147,7 +132,7 @@ export default function OverlayPage() {
             const actionId = event.actionId;
             const action = actions.find(a => a.id === actionId);
             
-            if (action && event.bits >= action.bitCost) {
+            if (action && event.bits >= action.config.bitCost) {
               // Only keep the latest activation for each action
               if (!latestActivations[actionId] || 
                   new Date(event.timestamp) > new Date(latestActivations[actionId].timestamp)) {
@@ -161,7 +146,7 @@ export default function OverlayPage() {
             const action = actions.find(a => a.id === actionId);
             if (action && updated[actionId]) {
               const activatedAt = new Date(event.timestamp);
-              const endsAt = new Date(activatedAt.getTime() + (action.durationMinutes * 60 * 1000));
+              const endsAt = new Date(activatedAt.getTime() + (action.config.duration * 60 * 1000));
               const now = new Date();
               const remainingMs = endsAt.getTime() - now.getTime();
               
@@ -354,11 +339,11 @@ export default function OverlayPage() {
     }
   }, [triggeredActions]);
 
-  if (!game || !userId) {
+  if (!overlayId || !userId) {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-white text-xl">
-          {!userId ? "User not specified" : "Game not specified"}
+          {!userId ? "User not specified" : "Overlay not specified"}
         </div>
       </div>
     );
@@ -399,19 +384,19 @@ export default function OverlayPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent p-4">
+    <div className="min-h-screen bg-transparent p-4 flex justify-center flex-col">
       <div className="flex items-center justify-between mb-4">
         <SparklesText className="italic text-4xl text-white">
           Overaction
         </SparklesText>
         
         {/* Manual sync button for OBS */}
-        <button
+        {/* <button
           onClick={forceRefresh}
           className="bg-blue-600/80 hover:bg-blue-700/80 text-white px-3 py-1 rounded text-sm border border-blue-500/50"
         >
           🔄 Sync
-        </button>
+        </button> */}
       </div>
       {triggeredActions.length > 0 && (
         <div className="fixed top-4 right-4 space-y-2 z-50">
@@ -425,7 +410,7 @@ export default function OverlayPage() {
               }}
             >
               <div className="text-2xl bg-green-700/50 rounded-lg p-2 min-w-[48px] h-12 flex items-center justify-center">
-                {action.image}
+                {action.config.emoji}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-white font-medium text-sm truncate">
@@ -479,7 +464,7 @@ export default function OverlayPage() {
                 <div className={`text-2xl ${
                   isActive ? "bg-red-700/50" : isTriggered ? "bg-green-700/50" : "bg-gray-700/50"
                 } rounded-lg p-2 min-w-[48px] h-12 flex items-center justify-center transition-all duration-500`}>
-                  {isActive ? "🚫" : action.image}
+                  {isActive ? "🚫" : action.config.emoji}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-white font-medium text-sm truncate">
@@ -497,7 +482,7 @@ export default function OverlayPage() {
                       </span>
                     ) : (
                       <span>
-                        {action.description} | Duration: {action.durationMinutes}min
+                        {action.description || 'No description'} | Duration: {action.config.duration}min
                       </span>
                     )}
                   </div>
@@ -507,7 +492,7 @@ export default function OverlayPage() {
                       <div 
                         className="bg-red-400 h-1 rounded-full transition-all duration-1000 ease-out animate-pulse"
                         style={{ 
-                          width: `${Math.max(0, (remainingSeconds / (action.durationMinutes * 60)) * 100)}%` 
+                          width: `${Math.max(0, (remainingSeconds / (action.config.duration * 60)) * 100)}%` 
                         }}
                       />
                     </div>
@@ -518,7 +503,7 @@ export default function OverlayPage() {
                     ? "bg-red-500/30 border-red-400/50 text-red-300" 
                     : "bg-yellow-500/20 border-yellow-500/30 text-yellow-400"
                 } border rounded px-2 py-1 text-xs font-bold`}>
-                  {isActive ? formatTime(remainingSeconds) : `${action.bitCost} bits`}
+                  {isActive ? formatTime(remainingSeconds) : `${action.config.bitCost} bits`}
                 </div>
               </div>
               
@@ -528,7 +513,7 @@ export default function OverlayPage() {
       </div>
 
       {/* Debug Info (remove in production) */}
-      <div className="fixed bottom-4 left-4 bg-black/90 text-white text-xs p-3 rounded max-w-sm space-y-1 max-h-96 overflow-y-auto">
+      {/* <div className="fixed bottom-4 left-4 bg-black/90 text-white text-xs p-3 rounded max-w-sm space-y-1 max-h-96 overflow-y-auto">
         <div className="font-bold">Debug Info:</div>
         <div>User ID: {userId}</div>
         <div>Storage Key: overlay_{userId}_events</div>
@@ -566,7 +551,7 @@ export default function OverlayPage() {
         >
           Check localStorage
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

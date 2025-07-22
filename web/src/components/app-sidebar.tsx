@@ -1,13 +1,7 @@
 import * as React from "react";
 import {
-  Camera,
   LayoutDashboard,
-  FileText,
-  FileText as FileDescription,
-  HelpCircle,
   List,
-  Search,
-  Settings,
   TestTube,
 } from "lucide-react";
 
@@ -25,100 +19,39 @@ import {
 } from "@/components/ui/sidebar";
 import { SparklesText } from "./magicui/sparkles-text";
 import { useAuth } from "@/contexts/AuthContext";
+import { useActions } from "@/hooks/useActions";
 
-// Move navigation data outside component to prevent recreation on each render
-const navigationData = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Actions",
-      url: "/actions",
-      icon: List,
-    },
-    {
-      title: "Overlays",
-      url: "/overlays",
-      icon: List,
-    },
-    {
-      title: "Test Panel",
-      url: "/test-panel",
-      icon: TestTube,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: Camera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: FileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileText,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircle,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
-  ],
-};
+// Base navigation items that are always available
+const baseNavItems = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Actions",
+    url: "/actions",
+    icon: List,
+  },
+];
+
+// Additional navigation items that require actions to exist
+const actionsRequiredNavItems = [
+  {
+    title: "Overlays",
+    url: "/overlays",
+    icon: List,
+  },
+  {
+    title: "Test Panel",
+    url: "/test-panel",
+    icon: TestTube,
+  },
+];
 
 export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
+  const { hasActions } = useActions();
 
   // Create user data for NavUser component
   const userData = user ? {
@@ -130,6 +63,9 @@ export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.Com
     email: "",
     avatar: ""
   };
+
+  // Build navigation items based on whether user has actions
+  const navItems = hasActions ? [...baseNavItems, ...actionsRequiredNavItems] : baseNavItems;
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -150,8 +86,7 @@ export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.Com
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navigationData.navMain} />
-        <NavSecondary items={navigationData.navSecondary} className="mt-auto" />
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={userData} />

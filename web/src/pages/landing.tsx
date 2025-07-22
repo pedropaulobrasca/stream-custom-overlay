@@ -11,7 +11,7 @@ function LandingPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Monitor className="h-6 w-6" />
-            <span className="font-bold text-xl">Stream Custom Overlay</span>
+            <span className="font-bold text-xl">Overaction</span>
           </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" asChild>
@@ -124,7 +124,7 @@ function LandingPage() {
           <div className="container mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Stream?</h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of streamers who trust Stream Custom Overlay to deliver professional, 
+              Join thousands of streamers who trust Overaction to deliver professional, 
               engaging content to their audiences.
             </p>
             <Button size="lg" asChild>
@@ -138,7 +138,7 @@ function LandingPage() {
 
       <footer className="border-t py-8 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2024 Stream Custom Overlay. All rights reserved.</p>
+          <p>&copy; 2025 Overaction. All rights reserved.</p>
         </div>
       </footer>
     </div>

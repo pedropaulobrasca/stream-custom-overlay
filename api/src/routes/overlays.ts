@@ -1,13 +1,69 @@
 import express from "express";
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { db } from '../database/connection';
-import { overlays, Overlay, NewOverlay } from '../database/schema';
+import { overlays, actions, Overlay, NewOverlay } from '../database/schema';
 import { authenticateToken } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types/auth';
 
 const router = express.Router();
 
-// All routes require authentication
+// Public route for overlay access (no auth required)
+router.get("/public/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const overlay = await db
+      .select()
+      .from(overlays)
+      .where(eq(overlays.id, id))
+      .limit(1);
+
+    if (!overlay[0]) {
+      return res.status(404).json({ error: "Overlay not found" });
+    }
+
+    res.json(overlay[0]);
+  } catch (error) {
+    console.error("Error fetching public overlay:", error);
+    res.status(500).json({ error: "Failed to fetch overlay" });
+  }
+});
+
+// Public route for overlay actions (no auth required)
+router.get("/public/:id/actions", async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Get overlay first
+    const overlay = await db
+      .select()
+      .from(overlays)
+      .where(eq(overlays.id, id))
+      .limit(1);
+
+    if (!overlay[0]) {
+      return res.status(404).json({ error: "Overlay not found" });
+    }
+
+    // Get actions from overlay config
+    if (overlay[0].config && overlay[0].config.actions && overlay[0].config.actions.length > 0) {
+      const overlayActions = await db
+        .select()
+        .from(actions)
+        .where(inArray(actions.id, overlay[0].config.actions))
+        .where(eq(actions.isActive, true));
+
+      res.json(overlayActions);
+    } else {
+      res.json([]);
+    }
+  } catch (error) {
+    console.error("Error fetching overlay actions:", error);
+    res.status(500).json({ error: "Failed to fetch overlay actions" });
+  }
+});
+
+// All other routes require authentication
 router.use(authenticateToken);
 
 // Get all user overlays

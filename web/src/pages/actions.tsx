@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-import { Plus, Search, Edit2, Trash2, MoreVertical, Zap, Power, PowerOff } from "lucide-react";
-import { Action, CreateActionRequest } from "@/types/action";
+import { useState } from "react";
+import { Plus, Search, Edit2, Trash2, MoreVertical, Power, PowerOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -30,86 +29,93 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CreateActionModal } from "@/components/actions/create-action-modal";
-import { useActionsStore } from "@/stores/actions-store";
-import { getActionTypeLabel } from "@/data/mock-actions";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { CreateActionForm } from "@/components/create-action-form";
+import { useActions } from "@/hooks/useActions";
+import { api } from "@/lib/api";
 import { toast } from "sonner";
 
 function ActionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
-  const {
-    actions,
-    error,
-    fetchActions,
-    createAction,
-    deleteAction,
-    toggleAction,
-    clearError,
-  } = useActionsStore();
-
-  useEffect(() => {
-    fetchActions();
-  }, [fetchActions]);
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-      clearError();
-    }
-  }, [error, clearError]);
+  const { actions, loading, error, refreshActions } = useActions();
 
   const filteredActions = actions.filter(action =>
     action.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    action.description.toLowerCase().includes(searchTerm.toLowerCase()),
+    (action.description && action.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleEdit = (action: Action) => {
+  const handleEdit = (action: any) => {
     console.log("Edit action:", action);
-    // TODO: Implement edit modal
+    toast.info("Edit functionality coming soon");
   };
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteAction(id);
+      await api.delete(`/actions/${id}`);
       toast.success("Action deleted successfully");
-    } catch {
-      toast.error("Failed to delete action");
+      refreshActions();
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to delete action");
     }
   };
 
   const handleToggle = async (id: string) => {
     try {
-      await toggleAction(id);
+      await api.patch(`/actions/${id}/toggle`);
       toast.success("Action status updated");
-    } catch {
-      toast.error("Failed to update action status");
+      refreshActions();
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to update action status");
     }
   };
 
-  const handleCreateAction = async (data: CreateActionRequest) => {
-    try {
-      await createAction(data);
-      toast.success("Action created successfully");
-    } catch (error) {
-      toast.error("Failed to create action");
-      throw error;
-    }
+  const handleActionCreated = () => {
+    setShowCreateForm(false);
+    refreshActions();
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-1 flex-col p-6">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">Loading actions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-1 flex-col p-6">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-destructive">Error loading actions: {error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (showCreateForm) {
+    return (
+      <div className="flex flex-1 flex-col p-6">
+        <CreateActionForm
+          onActionCreated={handleActionCreated}
+          onCancel={() => setShowCreateForm(false)}
+        />
+      </div>
+    );
+  }
 
   return (
-    <ProtectedRoute>
-      <div className="flex flex-1 flex-col p-6">
+    <div className="flex flex-1 flex-col p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Stream Actions</h1>
           <p className="text-muted-foreground">
-            Manage actions that viewers can activate with bits
+            Manage actions that viewers can activate with bits on Albion Online
           </p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
+        <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="h-4 w-4 mr-2" />
           New Action
         </Button>
@@ -131,7 +137,7 @@ function ActionsPage() {
             {searchTerm ? "No actions found" : "No actions created yet"}
           </div>
           {!searchTerm && (
-            <Button onClick={() => setIsCreateModalOpen(true)} variant="outline">
+            <Button onClick={() => setShowCreateForm(true)} variant="outline">
               <Plus className="h-4 w-4 mr-2" />
               Create first action
             </Button>
@@ -142,10 +148,10 @@ function ActionsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">Image</TableHead>
+                <TableHead className="w-16">Icon</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead className="w-24">Type</TableHead>
+                <TableHead className="w-24">Bits</TableHead>
                 <TableHead className="w-24">Status</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
@@ -154,30 +160,22 @@ function ActionsPage() {
               {filteredActions.map((action) => (
                 <TableRow key={action.id}>
                   <TableCell>
-                    {action.image ? (
-                      <img
-                        src={action.image}
-                        alt={action.name}
-                        className="h-8 w-8 rounded object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-8 w-8 rounded bg-muted">
-                        <Zap className="h-4 w-4" />
-                      </div>
-                    )}
+                    <div className="flex items-center justify-center h-8 w-8 rounded bg-muted text-lg">
+                      {action.config?.emoji || "⚡"}
+                    </div>
                   </TableCell>
                   <TableCell className="font-medium">{action.name}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {action.description}
+                    {action.description || "No description"}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">
-                      {getActionTypeLabel(action.type)}
+                      {action.config?.bitCost || 100} bits
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={action.enabled ? "default" : "secondary"}>
-                      {action.enabled ? "Enabled" : "Disabled"}
+                    <Badge variant={action.isActive ? "default" : "secondary"}>
+                      {action.isActive ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -190,12 +188,12 @@ function ActionsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleToggle(action.id)}>
-                          {action.enabled ? (
+                          {action.isActive ? (
                             <PowerOff className="mr-2 h-4 w-4" />
                           ) : (
                             <Power className="mr-2 h-4 w-4" />
                           )}
-                          {action.enabled ? "Disable" : "Enable"}
+                          {action.isActive ? "Deactivate" : "Activate"}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleEdit(action)}>
                           <Edit2 className="mr-2 h-4 w-4" />
@@ -238,14 +236,7 @@ function ActionsPage() {
           </Table>
         </div>
       )}
-
-      <CreateActionModal
-        open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
-        onSubmit={handleCreateAction}
-      />
-      </div>
-    </ProtectedRoute>
+    </div>
   );
 }
 

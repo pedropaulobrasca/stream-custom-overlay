@@ -4,19 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Play, Zap } from "lucide-react";
-
-interface Action {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  bitCost: number;
-  enabled: boolean;
-  durationMinutes: number;
-}
+import { useActions } from "@/hooks/useActions";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface TestEvent {
   id: string;
@@ -28,63 +19,16 @@ interface TestEvent {
 }
 
 export default function TestPanelPage() {
-  // Simulated user ID - same as overlays page
-  const userId = "user_123abc";
-  
-  const [actions] = useState<Action[]>([
-    {
-      id: "1",
-      name: "Block Wood Collection",
-      description: "Block wood collection for duration",
-      image: "🪓",
-      bitCost: 139,
-      enabled: true,
-      durationMinutes: 10,
-    },
-    {
-      id: "2",
-      name: "Block Stone Collection", 
-      description: "Block stone collection for duration",
-      image: "⛏️",
-      bitCost: 85,
-      enabled: true,
-      durationMinutes: 8,
-    },
-    {
-      id: "3",
-      name: "Block Ore Collection",
-      description: "Block ore collection for duration", 
-      image: "⚒️",
-      bitCost: 13,
-      enabled: true,
-      durationMinutes: 3,
-    },
-    {
-      id: "4",
-      name: "Block Fiber Collection",
-      description: "Block fiber collection for duration",
-      image: "🌾", 
-      bitCost: 65,
-      enabled: true,
-      durationMinutes: 6,
-    },
-    {
-      id: "5",
-      name: "Block Hide Collection",
-      description: "Block hide resources for duration",
-      image: "🦌",
-      bitCost: 25,
-      enabled: true,
-      durationMinutes: 4,
-    },
-  ]);
+  const { user } = useAuth();
+  const { actions, loading, error } = useActions();
 
   const [testEvents, setTestEvents] = useState<TestEvent[]>([]);
   const [testUsername, setTestUsername] = useState("TestUser123");
   const [customBits, setCustomBits] = useState<number | "">("");
 
-  const triggerAction = async (action: Action, customBitAmount?: number) => {
-    const bitsUsed = customBitAmount || action.bitCost;
+  const triggerAction = async (action: any, customBitAmount?: number) => {
+    const bitCost = action.config?.bitCost || 100;
+    const bitsUsed = customBitAmount || bitCost;
     
     // Create test event
     const event: TestEvent = {
@@ -103,7 +47,7 @@ export default function TestPanelPage() {
     toast.success(`🎉 ${action.name} triggered! ${bitsUsed} bits from ${testUsername}`);
 
     // Store in localStorage so overlay can potentially read it (simple demo)
-    const overlayKey = `overlay_${userId}_events`;
+    const overlayKey = `overlay_${user?.userId}_events`;
     const existingEvents = JSON.parse(localStorage.getItem(overlayKey) || "[]");
     existingEvents.unshift(event);
     const updatedEvents = existingEvents.slice(0, 50);
@@ -124,7 +68,7 @@ export default function TestPanelPage() {
 
     // Also use BroadcastChannel for better cross-tab communication
     try {
-      const channel = new BroadcastChannel(`overlay_${userId}`);
+      const channel = new BroadcastChannel(`overlay_${user?.userId}`);
       channel.postMessage({
         type: 'NEW_EVENT',
         event: event,
@@ -138,7 +82,7 @@ export default function TestPanelPage() {
     
     // Also send to API for cross-platform communication (browser <-> OBS)
     try {
-      const response = await fetch(`/api/events/${userId}`, {
+      const response = await fetch(`/api/events/${user?.userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -162,20 +106,63 @@ export default function TestPanelPage() {
     triggerAction(action);
   };
 
-  const customTrigger = (action: Action) => {
-    const bits = typeof customBits === "number" ? customBits : action.bitCost;
+  const customTrigger = (action: any) => {
+    const bitCost = action.config?.bitCost || 100;
+    const bits = typeof customBits === "number" ? customBits : bitCost;
     triggerAction(action, bits);
   };
 
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">Loading actions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-destructive">Error loading actions: {error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (actions.length === 0) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold">Test Panel</h1>
+            <p className="text-muted-foreground">
+              Simulate bit donations to test overlay actions
+            </p>
+          </div>
+        </div>
+        
+        <div className="border rounded-lg p-8 text-center">
+          <p className="text-muted-foreground mb-4">No actions available to test.</p>
+          <p className="text-sm text-muted-foreground">
+            Create your first action to start testing overlay functionality.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const clearEvents = async () => {
-    const overlayKey = `overlay_${userId}_events`;
+    const overlayKey = `overlay_${user?.userId}_events`;
     
     // Clear localStorage
     localStorage.removeItem(overlayKey);
     
     // Clear API
     try {
-      const response = await fetch(`/api/events/${userId}`, {
+      const response = await fetch(`/api/events/${user?.userId}`, {
         method: 'DELETE',
       });
       
@@ -253,44 +240,50 @@ export default function TestPanelPage() {
 
       {/* Actions Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {actions.map((action) => (
-          <Card key={action.id}>
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="text-2xl bg-muted rounded-lg p-2 min-w-[48px] h-12 flex items-center justify-center">
-                  {action.image}
-                </div>
-                <div className="flex-1">
-                  <CardTitle className="text-lg">{action.name}</CardTitle>
-                  <div className="flex gap-2">
-                    <Badge variant="secondary">{action.bitCost} bits</Badge>
-                    <Badge variant="outline">{action.durationMinutes}min</Badge>
+        {actions.map((action) => {
+          const bitCost = action.config?.bitCost || 100;
+          const duration = action.config?.duration || 5;
+          const emoji = action.config?.emoji || "⚡";
+          
+          return (
+            <Card key={action.id}>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl bg-muted rounded-lg p-2 min-w-[48px] h-12 flex items-center justify-center">
+                    {emoji}
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-lg">{action.name}</CardTitle>
+                    <div className="flex gap-2">
+                      <Badge variant="secondary">{bitCost} bits</Badge>
+                      <Badge variant="outline">{duration}min</Badge>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <CardDescription>{action.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button 
-                onClick={() => quickTrigger(action)}
-                className="w-full"
-                variant="default"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Quick Test ({action.bitCost} bits)
-              </Button>
-              <Button 
-                onClick={() => customTrigger(action)}
-                className="w-full"
-                variant="outline"
-                disabled={!testUsername}
-              >
-                <Zap className="w-4 h-4 mr-2" />
-                Custom Test ({typeof customBits === "number" ? customBits : action.bitCost} bits)
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+                <CardDescription>{action.description || 'No description'}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button 
+                  onClick={() => quickTrigger(action)}
+                  className="w-full"
+                  variant="default"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Quick Test ({bitCost} bits)
+                </Button>
+                <Button 
+                  onClick={() => customTrigger(action)}
+                  className="w-full"
+                  variant="outline"
+                  disabled={!testUsername}
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  Custom Test ({typeof customBits === "number" ? customBits : bitCost} bits)
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {/* Recent Events */}
@@ -334,7 +327,7 @@ export default function TestPanelPage() {
             <p>• <strong>Custom Test:</strong> Uses the custom bits amount or default if not set</p>
             <p>• Configure username and custom bits in the test configuration above</p>
             <p>• Events are stored locally and can be read by the overlay (refresh overlay to see new events)</p>
-            <p>• Overlay URL: <code>localhost:3000/overlay/{userId}/albion</code></p>
+            <p>• Overlay URL: <code>localhost:3000/overlay/{user?.userId}/albion</code></p>
           </div>
         </CardContent>
       </Card>
