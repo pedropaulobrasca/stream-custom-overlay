@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,18 @@ import { toast } from "sonner";
 import { Play, Zap } from "lucide-react";
 import { useActions } from "@/hooks/useActions";
 import { useAuth } from "@/contexts/AuthContext";
+
+interface Action {
+  id: string;
+  name: string;
+  description: string;
+  config: {
+    emoji: string;
+    bitCost: number;
+    duration: number;
+  };
+  isActive: boolean;
+}
 
 interface TestEvent {
   id: string;
@@ -29,7 +41,7 @@ export default function TestPanelPage() {
   const triggerAction = async (action: any, customBitAmount?: number) => {
     const bitCost = action.config?.bitCost || 100;
     const bitsUsed = customBitAmount || bitCost;
-    
+
     // Create test event
     const event: TestEvent = {
       id: `test_${Date.now()}`,
@@ -52,15 +64,15 @@ export default function TestPanelPage() {
     existingEvents.unshift(event);
     const updatedEvents = existingEvents.slice(0, 50);
     localStorage.setItem(overlayKey, JSON.stringify(updatedEvents));
-    
+
     // Force storage event for cross-tab communication
     // Note: storage events don't fire in the same tab, so we trigger manually
-    const storageEvent = new StorageEvent('storage', {
+    const storageEvent = new StorageEvent("storage", {
       key: overlayKey,
       newValue: JSON.stringify(updatedEvents),
       oldValue: JSON.stringify(existingEvents),
     });
-    
+
     // Dispatch to other windows/tabs
     setTimeout(() => {
       window.dispatchEvent(storageEvent);
@@ -70,26 +82,26 @@ export default function TestPanelPage() {
     try {
       const channel = new BroadcastChannel(`overlay_${user?.userId}`);
       channel.postMessage({
-        type: 'NEW_EVENT',
+        type: "NEW_EVENT",
         event: event,
-        allEvents: updatedEvents
+        allEvents: updatedEvents,
       });
       channel.close();
       console.log("BroadcastChannel message sent");
     } catch (error) {
       console.log("BroadcastChannel not supported:", error);
     }
-    
+
     // Also send to API for cross-platform communication (browser <-> OBS)
     try {
       const response = await fetch(`/api/events/${user?.userId}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(event),
       });
-      
+
       if (response.ok) {
         console.log("Event sent to API successfully");
       } else {
@@ -98,7 +110,7 @@ export default function TestPanelPage() {
     } catch (error) {
       console.error("Error sending event to API:", error);
     }
-    
+
     console.log("Event stored and storage event dispatched:", { overlayKey, event, totalEvents: updatedEvents.length });
   };
 
@@ -143,7 +155,7 @@ export default function TestPanelPage() {
             </p>
           </div>
         </div>
-        
+
         <div className="border rounded-lg p-8 text-center">
           <p className="text-muted-foreground mb-4">No actions available to test.</p>
           <p className="text-sm text-muted-foreground">
@@ -156,16 +168,16 @@ export default function TestPanelPage() {
 
   const clearEvents = async () => {
     const overlayKey = `overlay_${user?.userId}_events`;
-    
+
     // Clear localStorage
     localStorage.removeItem(overlayKey);
-    
+
     // Clear API
     try {
       const response = await fetch(`/api/events/${user?.userId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
-      
+
       if (response.ok) {
         console.log("Events cleared from API successfully");
       } else {
@@ -174,21 +186,21 @@ export default function TestPanelPage() {
     } catch (error) {
       console.error("Error clearing events from API:", error);
     }
-    
+
     // Clear local state
     setTestEvents([]);
-    
+
     // Force storage event for overlay
-    const storageEvent = new StorageEvent('storage', {
+    const storageEvent = new StorageEvent("storage", {
       key: overlayKey,
       newValue: null,
       oldValue: "[]",
     });
-    
+
     setTimeout(() => {
       window.dispatchEvent(storageEvent);
     }, 100);
-    
+
     toast.success("Events cleared!");
     console.log("Cleared events for key:", overlayKey);
   };
@@ -244,7 +256,7 @@ export default function TestPanelPage() {
           const bitCost = action.config?.bitCost || 100;
           const duration = action.config?.duration || 5;
           const emoji = action.config?.emoji || "⚡";
-          
+
           return (
             <Card key={action.id}>
               <CardHeader>
@@ -260,10 +272,10 @@ export default function TestPanelPage() {
                     </div>
                   </div>
                 </div>
-                <CardDescription>{action.description || 'No description'}</CardDescription>
+                <CardDescription>{action.description || "No description"}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button 
+                <Button
                   onClick={() => quickTrigger(action)}
                   className="w-full"
                   variant="default"
@@ -271,7 +283,7 @@ export default function TestPanelPage() {
                   <Play className="w-4 h-4 mr-2" />
                   Quick Test ({bitCost} bits)
                 </Button>
-                <Button 
+                <Button
                   onClick={() => customTrigger(action)}
                   className="w-full"
                   variant="outline"

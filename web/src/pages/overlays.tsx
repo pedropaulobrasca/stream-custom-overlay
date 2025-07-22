@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -13,25 +14,25 @@ import { toast } from "sonner";
 import { useOverlays } from "@/hooks/useOverlays";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function OverlaysPage() {
+export default function OverlaysPage(): React.ReactElement {
   const { user } = useAuth();
   const { overlays, loading, error } = useOverlays();
 
-  const copyToClipboard = (overlayId: string) => {
+  const copyToClipboard = (overlayId: string): void => {
     const url = `${window.location.origin}/overlay/${user?.userId}/${overlayId}`;
     navigator.clipboard.writeText(url);
     toast.success("URL copied to clipboard");
   };
 
-  const handleEdit = (overlay: any) => {
+  const handleEdit = (): void => {
     toast.info("Edit functionality coming soon");
   };
 
-  const handleDelete = (overlay: any) => {
+  const handleDelete = (): void => {
     toast.info("Delete functionality coming soon");
   };
 
-  const openOverlay = (overlayId: string) => {
+  const openOverlay = (overlayId: string): void => {
     const url = `${window.location.origin}/overlay/${user?.userId}/${overlayId}`;
     window.open(url, "_blank");
   };
@@ -93,12 +94,12 @@ export default function OverlaysPage() {
               {overlays.map((overlay) => {
                 const overlayUrl = `${window.location.origin}/overlay/${user?.userId}/${overlay.id}`;
                 const formattedDate = new Date(overlay.createdAt).toLocaleDateString();
-                
+
                 return (
                   <TableRow key={overlay.id}>
                     <TableCell className="font-medium">{overlay.name}</TableCell>
                     <TableCell>
-                      <Badge 
+                      <Badge
                         variant={overlay.isActive ? "default" : "secondary"}
                       >
                         {overlay.isActive ? "active" : "inactive"}

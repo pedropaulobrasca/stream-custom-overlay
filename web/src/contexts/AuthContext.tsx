@@ -1,13 +1,13 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react';
-import { AuthContextType, User } from '@/types/auth';
-import { AuthService } from '@/services/auth';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from "react";
+import { AuthContextType, User } from "@/types/auth";
+import { AuthService } from "@/services/auth";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -29,27 +29,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Handle OAuth callback
-    const handleOAuthCallback = async () => {
+    const handleOAuthCallback = async (): Promise<void> => {
       const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const state = urlParams.get('state');
+      const code = urlParams.get("code");
+      const state = urlParams.get("state");
 
       if (code && state && !callbackProcessing.current) {
-        console.log('Processing OAuth callback...');
+        console.log("Processing OAuth callback...");
         callbackProcessing.current = true;
-        
+
         try {
           setIsLoading(true);
           const authData = await authService.handleCallback(code, state);
           setUser(authData.user);
           setToken(authData.token);
-          
-          console.log('OAuth callback success, redirecting to dashboard');
+
+          console.log("OAuth callback success, redirecting to dashboard");
           // Clear URL parameters and redirect to dashboard
-          window.history.replaceState({}, document.title, '/dashboard');
-          window.location.href = '/dashboard';
+          window.history.replaceState({}, document.title, "/dashboard");
+          window.location.href = "/dashboard";
         } catch (error) {
-          console.error('OAuth callback error:', error);
+          console.error("OAuth callback error:", error);
           callbackProcessing.current = false;
           setIsLoading(false);
         }
@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     handleOAuthCallback();
   }, []);
 
-  const initializeAuth = async () => {
+  const initializeAuth = async (): Promise<void> => {
     try {
       const storedToken = authService.getStoredToken();
       const storedUser = authService.getStoredUser();
@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('Auth initialization error:', error);
+      console.error("Auth initialization error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -85,11 +85,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       const authUrl = await authService.initializeAuth();
-      
+
       // Redirect to Twitch OAuth
       window.location.href = authUrl;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       setIsLoading(false);
       throw error;
     }

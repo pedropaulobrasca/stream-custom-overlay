@@ -1,10 +1,11 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Monitor, Zap, Shield, Users, Palette, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-function LandingPage() {
+function LandingPage(): React.ReactElement {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -35,7 +36,7 @@ function LandingPage() {
               <span className="text-primary"> Custom Overlays</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Create stunning, interactive overlays for your streams with real-time data integration, 
+              Create stunning, interactive overlays for your streams with real-time data integration,
               custom animations, and professional layouts that engage your audience.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -66,7 +67,7 @@ function LandingPage() {
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <Palette className="h-8 w-8 text-primary mb-2" />
@@ -76,7 +77,7 @@ function LandingPage() {
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <Shield className="h-8 w-8 text-primary mb-2" />
@@ -86,7 +87,7 @@ function LandingPage() {
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <Users className="h-8 w-8 text-primary mb-2" />
@@ -96,7 +97,7 @@ function LandingPage() {
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <BarChart3 className="h-8 w-8 text-primary mb-2" />
@@ -106,7 +107,7 @@ function LandingPage() {
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <Monitor className="h-8 w-8 text-primary mb-2" />
@@ -124,7 +125,7 @@ function LandingPage() {
           <div className="container mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Stream?</h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of streamers who trust Overaction to deliver professional, 
+              Join thousands of streamers who trust Overaction to deliver professional,
               engaging content to their audiences.
             </p>
             <Button size="lg" asChild>

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
+import { useState, useEffect } from "react";
+import { api } from "@/lib/api";
 
 export interface Action {
   id: string;
@@ -23,11 +23,11 @@ export function useActions() {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get('/actions');
+      const response = await api.get("/actions");
       setActions(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to fetch actions');
-      console.error('Error fetching actions:', err);
+      setError(err.response?.data?.error || "Failed to fetch actions");
+      console.error("Error fetching actions:", err);
     } finally {
       setLoading(false);
     }
@@ -46,6 +46,6 @@ export function useActions() {
     loading,
     error,
     refreshActions,
-    hasActions: actions.length > 0
+    hasActions: actions.length > 0,
   };
 }

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   MoreVertical,
   LogOut,
@@ -11,7 +12,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -37,16 +37,16 @@ export function NavUser({
   const { isMobile } = useSidebar();
   const { logout } = useAuth();
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     logout();
   };
 
   // Generate initials from user name
-  const getInitials = (name: string) => {
+  const getInitials = (name: string): string => {
     return name
-      .split(' ')
+      .split(" ")
       .map(word => word.charAt(0))
-      .join('')
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };

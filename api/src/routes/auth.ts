@@ -70,7 +70,7 @@ router.post("/callback", async (req, res) => {
       tokens.access_token,
       tokens.refresh_token,
       expiresAt,
-      TWITCH_CONFIG.SCOPES
+      TWITCH_CONFIG.SCOPES,
     );
 
     // Create JWT payload

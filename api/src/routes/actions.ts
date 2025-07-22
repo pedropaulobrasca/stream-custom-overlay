@@ -1,9 +1,9 @@
 import express from "express";
-import { eq } from 'drizzle-orm';
-import { db } from '../database/connection';
-import { actions, overlays, Action, NewAction, NewOverlay } from '../database/schema';
-import { authenticateToken } from '../middleware/auth';
-import { AuthenticatedRequest } from '../types/auth';
+import { eq } from "drizzle-orm";
+import { db } from "../database/connection";
+import { actions, overlays, NewAction, NewOverlay } from "../database/schema";
+import { authenticateToken } from "../middleware/auth";
+import { AuthenticatedRequest } from "../types/auth";
 
 const router = express.Router();
 
@@ -30,7 +30,7 @@ router.get("/", async (req: AuthenticatedRequest, res) => {
 router.get("/:id", async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
-    
+
     const action = await db
       .select()
       .from(actions)
@@ -51,7 +51,7 @@ router.get("/:id", async (req: AuthenticatedRequest, res) => {
 // Create new action
 router.post("/", async (req: AuthenticatedRequest, res) => {
   try {
-    const { name, description, type, config, image } = req.body;
+    const { name, description, type, config } = req.body;
 
     if (!name || !type || !config) {
       return res.status(400).json({ error: "Name, type, and config are required" });
@@ -78,7 +78,7 @@ router.post("/", async (req: AuthenticatedRequest, res) => {
         .select()
         .from(overlays)
         .where(eq(overlays.userId, userId))
-        .where(eq(overlays.game, 'albion-online'))
+        .where(eq(overlays.game, "albion-online"))
         .limit(1);
 
       let overlay;
@@ -86,14 +86,14 @@ router.post("/", async (req: AuthenticatedRequest, res) => {
         // Create Albion overlay if it doesn't exist
         const newOverlay: NewOverlay = {
           userId,
-          name: 'Albion Online Overlay',
-          description: 'Overlay for Albion Online actions',
-          game: 'albion-online',
+          name: "Albion Online Overlay",
+          description: "Overlay for Albion Online actions",
+          game: "albion-online",
           config: {
-            theme: 'default',
+            theme: "default",
             position: { x: 100, y: 100 },
             size: { width: 400, height: 300 },
-            actions: [createdAction[0].id]
+            actions: [createdAction[0].id],
           },
           isActive: true,
         };
@@ -101,17 +101,17 @@ router.post("/", async (req: AuthenticatedRequest, res) => {
         overlay = await tx.insert(overlays).values(newOverlay).returning();
       } else {
         // Update existing overlay to include new action
-        const currentConfig = existingOverlay[0].config as any;
+        const currentConfig = existingOverlay[0].config as Record<string, any>;
         const updatedConfig = {
           ...currentConfig,
-          actions: [...(currentConfig.actions || []), createdAction[0].id]
+          actions: [...(currentConfig.actions || []), createdAction[0].id],
         };
 
         overlay = await tx
           .update(overlays)
-          .set({ 
+          .set({
             config: updatedConfig,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           })
           .where(eq(overlays.id, existingOverlay[0].id))
           .returning();
@@ -131,7 +131,7 @@ router.post("/", async (req: AuthenticatedRequest, res) => {
 router.put("/:id", async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
-    const { name, description, type, config, image, isActive } = req.body;
+    const { name, description, type, config, isActive } = req.body;
 
     // Check if action exists and belongs to user
     const existingAction = await db
@@ -185,7 +185,7 @@ router.patch("/:id/toggle", async (req: AuthenticatedRequest, res) => {
 
     const updatedAction = await db
       .update(actions)
-      .set({ 
+      .set({
         isActive: !existingAction[0].isActive,
         updatedAt: new Date(),
       })

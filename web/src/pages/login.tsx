@@ -4,16 +4,16 @@ import { Monitor, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function LoginPage() {
+function LoginPage(): React.ReactElement {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
@@ -27,7 +27,7 @@ function LoginPage() {
               Back to Home
             </Link>
           </Button>
-          
+
           <div className="flex items-center space-x-2 mb-2">
             <Monitor className="h-8 w-8 text-primary" />
             <span className="font-bold text-2xl">Overaction</span>
@@ -44,7 +44,7 @@ function LoginPage() {
           <CardContent className="space-y-6">
             <div className="flex flex-col items-center space-y-4">
               <LoginButton />
-              
+
               <div className="text-center text-sm text-muted-foreground">
                 By signing in, you agree to our Terms of Service and Privacy Policy
               </div>

@@ -1,4 +1,4 @@
-import { api } from '@/lib/api';
+import { api } from "@/lib/api";
 
 export interface BitsLeaderboard {
   data: {
@@ -64,28 +64,28 @@ export class TwitchAPIService {
       const response = await api.get(`/twitch/bits/leaderboard?count=${count}`);
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch bits leaderboard:', error);
-      throw new Error('Failed to fetch bits leaderboard');
+      console.error("Failed to fetch bits leaderboard:", error);
+      throw new Error("Failed to fetch bits leaderboard");
     }
   }
 
   async getCheermotes(): Promise<{ data: Cheermote[] }> {
     try {
-      const response = await api.get('/twitch/bits/cheermotes');
+      const response = await api.get("/twitch/bits/cheermotes");
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch cheermotes:', error);
-      throw new Error('Failed to fetch cheermotes');
+      console.error("Failed to fetch cheermotes:", error);
+      throw new Error("Failed to fetch cheermotes");
     }
   }
 
   async getChannelInfo(): Promise<{ data: ChannelInfo[] }> {
     try {
-      const response = await api.get('/twitch/user/channel');
+      const response = await api.get("/twitch/user/channel");
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch channel info:', error);
-      throw new Error('Failed to fetch channel info');
+      console.error("Failed to fetch channel info:", error);
+      throw new Error("Failed to fetch channel info");
     }
   }
 }

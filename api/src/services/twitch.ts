@@ -13,7 +13,7 @@ export class TwitchService {
   }
 
   public getAuthUrl(state: string): string {
-    const params = new URLSearchParams({
+    const params = new global.URLSearchParams({
       client_id: TWITCH_CONFIG.CLIENT_ID,
       redirect_uri: TWITCH_CONFIG.REDIRECT_URI,
       response_type: "code",

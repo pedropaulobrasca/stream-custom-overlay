@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ function AuthCallbackPage() {
     if (!isLoading) {
       // Small delay to ensure auth processing is complete
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }, 100);
     }
   }, [isLoading, navigate]);

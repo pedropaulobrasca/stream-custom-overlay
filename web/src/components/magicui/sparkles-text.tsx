@@ -1,5 +1,5 @@
+import React, { CSSProperties, ReactElement, useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { CSSProperties, ReactElement, useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -13,7 +13,7 @@ interface Sparkle {
   lifespan: number;
 }
 
-const Sparkle: React.FC<Sparkle> = ({ id, x, y, color, delay, scale }) => {
+const SparkleComponent: React.FC<Sparkle> = ({ id, x, y, color, delay, scale }) => {
   return (
     <motion.svg
       key={id}
@@ -139,7 +139,7 @@ export const SparklesText: React.FC<SparklesTextProps> = ({
     >
       <span className="relative inline-block">
         {sparkles.map((sparkle) => (
-          <Sparkle key={sparkle.id} {...sparkle} />
+          <SparkleComponent key={sparkle.id} {...sparkle} />
         ))}
         <strong>{children}</strong>
       </span>

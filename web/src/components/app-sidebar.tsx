@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {
   LayoutDashboard,
   List,
@@ -6,7 +6,6 @@ import {
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -57,11 +56,11 @@ export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.Com
   const userData = user ? {
     name: user.displayName || user.username,
     email: `@${user.username}`,
-    avatar: user.profileImage
+    avatar: user.profileImage,
   } : {
     name: "Loading...",
     email: "",
-    avatar: ""
+    avatar: "",
   };
 
   // Build navigation items based on whether user has actions

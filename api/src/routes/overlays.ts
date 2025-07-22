@@ -1,9 +1,9 @@
 import express from "express";
-import { eq, inArray } from 'drizzle-orm';
-import { db } from '../database/connection';
-import { overlays, actions, Overlay, NewOverlay } from '../database/schema';
-import { authenticateToken } from '../middleware/auth';
-import { AuthenticatedRequest } from '../types/auth';
+import { eq, inArray } from "drizzle-orm";
+import { db } from "../database/connection";
+import { overlays, actions, NewOverlay } from "../database/schema";
+import { authenticateToken } from "../middleware/auth";
+import { AuthenticatedRequest } from "../types/auth";
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ const router = express.Router();
 router.get("/public/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const overlay = await db
       .select()
       .from(overlays)
@@ -33,7 +33,7 @@ router.get("/public/:id", async (req, res) => {
 router.get("/public/:id/actions", async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Get overlay first
     const overlay = await db
       .select()
@@ -86,7 +86,7 @@ router.get("/", async (req: AuthenticatedRequest, res) => {
 router.get("/:id", async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
-    
+
     const overlay = await db
       .select()
       .from(overlays)
@@ -189,7 +189,7 @@ router.patch("/:id/toggle", async (req: AuthenticatedRequest, res) => {
 
     const updatedOverlay = await db
       .update(overlays)
-      .set({ 
+      .set({
         isActive: !existingOverlay[0].isActive,
         updatedAt: new Date(),
       })
@@ -221,7 +221,7 @@ router.post("/:id/view", async (req: AuthenticatedRequest, res) => {
 
     const updatedOverlay = await db
       .update(overlays)
-      .set({ 
+      .set({
         viewCount: existingOverlay[0].viewCount + 1,
         updatedAt: new Date(),
       })

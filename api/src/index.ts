@@ -56,7 +56,7 @@ app.use("/api/overlays", overlaysRouter);
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
-  
+
   // Test database connection on startup
   const dbConnected = await testDatabaseConnection();
   if (!dbConnected) {

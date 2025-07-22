@@ -42,7 +42,7 @@ function ActionsPage() {
 
   const filteredActions = actions.filter(action =>
     action.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (action.description && action.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    (action.description && action.description.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   const handleEdit = (action: any) => {

@@ -27,7 +27,7 @@ export const useActionsStore = create<ActionsState>()(
       fetchActions: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await api.get('/actions');
+          const response = await api.get("/actions");
           const actions = response.data.map((action: any) => ({
             ...action,
             enabled: action.isActive,
@@ -45,7 +45,7 @@ export const useActionsStore = create<ActionsState>()(
       createAction: async (data: CreateActionRequest) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await api.post('/actions', data);
+          const response = await api.post("/actions", data);
           const newAction = {
             ...response.data,
             enabled: response.data.isActive,

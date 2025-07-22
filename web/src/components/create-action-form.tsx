@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,21 +22,21 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
     emoji: "⚡",
     bitCost: 100,
     duration: 5,
-    type: "albion-resource-block"
+    type: "albion-resource-block",
   });
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       toast.error("Action name is required");
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const actionData = {
         name: formData.name.trim(),
@@ -46,14 +46,14 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
           emoji: formData.emoji,
           bitCost: formData.bitCost,
           duration: formData.duration,
-          game: "albion-online"
-        }
+          game: "albion-online",
+        },
       };
 
-      await api.post('/actions', actionData);
-      
+      await api.post("/actions", actionData);
+
       toast.success("Action created successfully!");
-      
+
       // Reset form
       setFormData({
         name: "",
@@ -61,12 +61,12 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
         emoji: "⚡",
         bitCost: 100,
         duration: 5,
-        type: "albion-resource-block"
+        type: "albion-resource-block",
       });
-      
+
       onActionCreated?.();
     } catch (error: any) {
-      console.error('Error creating action:', error);
+      console.error("Error creating action:", error);
       toast.error(error.response?.data?.error || "Failed to create action");
     } finally {
       setIsSubmitting(false);
@@ -199,7 +199,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2 text-sm text-muted-foreground">
               <h4 className="font-medium text-foreground">Action Details:</h4>
               <div className="space-y-1">

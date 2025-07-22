@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface TwitchEvent {
-  type: 'CHEER' | 'CHANNEL_POINT_REDEMPTION' | 'FOLLOW' | 'SUBSCRIBE' | 'connected' | 'new_event' | 'CLEAR_EVENTS';
+  type: "CHEER" | "CHANNEL_POINT_REDEMPTION" | "FOLLOW" | "SUBSCRIBE" | "connected" | "new_event" | "CLEAR_EVENTS";
   user?: string;
   userId?: string;
   bits?: number;
@@ -34,31 +34,31 @@ export function useTwitchEvents() {
     const eventSource = new EventSource(`/api/sse/${user.twitchId}`);
 
     eventSource.onopen = () => {
-      console.log('SSE connection opened');
+      console.log("SSE connection opened");
       setIsConnected(true);
     };
 
     eventSource.onmessage = (event) => {
       try {
         const data: TwitchEvent = JSON.parse(event.data);
-        console.log('Received SSE event:', data);
+        console.log("Received SSE event:", data);
 
-        if (data.type === 'connected') {
+        if (data.type === "connected") {
           setIsConnected(true);
-        } else if (data.type === 'new_event') {
+        } else if (data.type === "new_event") {
           setEvents((prev) => [data.event, ...prev.slice(0, 49)]);
-        } else if (data.type === 'CLEAR_EVENTS') {
+        } else if (data.type === "CLEAR_EVENTS") {
           setEvents([]);
         } else {
           setEvents((prev) => [data, ...prev.slice(0, 49)]);
         }
       } catch (error) {
-        console.error('Failed to parse SSE event:', error);
+        console.error("Failed to parse SSE event:", error);
       }
     };
 
     eventSource.onerror = (error) => {
-      console.error('SSE connection error:', error);
+      console.error("SSE connection error:", error);
       setIsConnected(false);
     };
 
@@ -73,9 +73,9 @@ export function useTwitchEvents() {
 
     try {
       const response = await fetch(`/api/events/${user.twitchId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+          "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
         },
       });
 
@@ -83,7 +83,7 @@ export function useTwitchEvents() {
         setEvents([]);
       }
     } catch (error) {
-      console.error('Failed to clear events:', error);
+      console.error("Failed to clear events:", error);
     }
   };
 

@@ -21,8 +21,8 @@ export function ActionCardPreview({ name, description, emoji, bitCost }: ActionC
           {description || "Action description..."}
         </p>
       </div>
-      <Badge 
-        variant="secondary" 
+      <Badge
+        variant="secondary"
         className="bg-yellow-500 text-black hover:bg-yellow-500 text-xs font-medium px-2 py-1"
       >
         {bitCost || 0} bits

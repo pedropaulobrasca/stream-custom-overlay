@@ -1,7 +1,7 @@
-import { eq } from 'drizzle-orm';
-import { db } from '../database/connection';
-import { users, userSessions, twitchIntegrations, User, NewUser } from '../database/schema';
-import { TwitchUser } from '../types/auth';
+import { eq } from "drizzle-orm";
+import { db } from "../database/connection";
+import { users, userSessions, twitchIntegrations, User, NewUser } from "../database/schema";
+import { TwitchUser } from "../types/auth";
 
 export class UserService {
   private static instance: UserService;
@@ -24,7 +24,7 @@ export class UserService {
 
       return result[0] || null;
     } catch (error) {
-      console.error('Error finding user by Twitch ID:', error);
+      console.error("Error finding user by Twitch ID:", error);
       throw error;
     }
   }
@@ -65,7 +65,7 @@ export class UserService {
         return createdUser[0];
       }
     } catch (error) {
-      console.error('Error creating/updating user from Twitch:', error);
+      console.error("Error creating/updating user from Twitch:", error);
       throw error;
     }
   }
@@ -80,7 +80,7 @@ export class UserService {
         expiresAt: expiresAt || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days default
       });
     } catch (error) {
-      console.error('Error creating user session:', error);
+      console.error("Error creating user session:", error);
       throw error;
     }
   }
@@ -91,7 +91,7 @@ export class UserService {
     accessToken: string,
     refreshToken: string,
     expiresAt: Date,
-    scopes: string[]
+    scopes: string[],
   ): Promise<void> {
     try {
       // Check if integration exists
@@ -124,7 +124,7 @@ export class UserService {
         });
       }
     } catch (error) {
-      console.error('Error storing Twitch integration:', error);
+      console.error("Error storing Twitch integration:", error);
       throw error;
     }
   }
@@ -140,7 +140,7 @@ export class UserService {
 
       return result[0] || null;
     } catch (error) {
-      console.error('Error finding user by ID:', error);
+      console.error("Error finding user by ID:", error);
       throw error;
     }
   }
@@ -152,13 +152,13 @@ export class UserService {
         .delete(userSessions)
         .where(eq(userSessions.token, token));
     } catch (error) {
-      console.error('Error deleting user session:', error);
+      console.error("Error deleting user session:", error);
       throw error;
     }
   }
 
   // Get user's Twitch integration
-  async getTwitchIntegration(userId: string) {
+  async getTwitchIntegration(userId: string): Promise<any> {
     try {
       const result = await db
         .select()
@@ -168,7 +168,7 @@ export class UserService {
 
       return result[0] || null;
     } catch (error) {
-      console.error('Error getting Twitch integration:', error);
+      console.error("Error getting Twitch integration:", error);
       throw error;
     }
   }

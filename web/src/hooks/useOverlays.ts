@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
+import { useState, useEffect } from "react";
+import { api } from "@/lib/api";
 
 export interface Overlay {
   id: string;
@@ -23,11 +23,11 @@ export function useOverlays() {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get('/overlays');
+      const response = await api.get("/overlays");
       setOverlays(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to fetch overlays');
-      console.error('Error fetching overlays:', err);
+      setError(err.response?.data?.error || "Failed to fetch overlays");
+      console.error("Error fetching overlays:", err);
     } finally {
       setLoading(false);
     }
@@ -46,6 +46,6 @@ export function useOverlays() {
     loading,
     error,
     refreshOverlays,
-    hasOverlays: overlays.length > 0
+    hasOverlays: overlays.length > 0,
   };
 }
