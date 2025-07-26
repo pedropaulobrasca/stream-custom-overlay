@@ -110,9 +110,9 @@ function ActionsPage() {
     <div className="flex flex-1 flex-col p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Stream Actions</h1>
+          <h1 className="text-2xl font-bold">Albion Online Stream Actions</h1>
           <p className="text-muted-foreground">
-            Manage actions that viewers can activate with bits on Albion Online
+            Manage Albion Online stream actions that viewers can activate with Twitch bits
           </p>
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
@@ -150,6 +150,7 @@ function ActionsPage() {
               <TableRow>
                 <TableHead className="w-16">Icon</TableHead>
                 <TableHead>Name</TableHead>
+                <TableHead>Game</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead className="w-24">Bits</TableHead>
                 <TableHead className="w-24">Status</TableHead>
@@ -181,6 +182,12 @@ function ActionsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">{action.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-orange-500 rounded"></div>
+                      <span className="text-sm font-medium">Albion Online</span>
+                    </div>
+                  </TableCell>
                   <TableCell className="text-muted-foreground">
                     {action.description || ""}
                   </TableCell>

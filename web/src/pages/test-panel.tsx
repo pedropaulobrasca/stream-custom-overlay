@@ -209,9 +209,9 @@ export default function TestPanelPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Test Panel</h1>
+          <h1 className="text-2xl font-bold">Albion Online Test Panel</h1>
           <p className="text-muted-foreground">
-            Simulate bit donations to test overlay actions
+            Simulate Twitch bit donations to test your Albion Online overlay actions
           </p>
         </div>
         <Button variant="destructive" onClick={clearEvents}>

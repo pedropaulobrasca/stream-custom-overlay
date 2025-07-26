@@ -79,13 +79,13 @@ function LandingPage(): React.ReactElement {
             <motion.div {...fadeInUp} className="mb-6">
               <Badge variant="outline" className="mb-6 px-4 py-2 text-sm font-medium border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
                 <Sparkles className="w-4 h-4 mr-2" />
-                Professional Streaming Tools
+                Albion Online Streaming Tools
               </Badge>
             </motion.div>
 
             <motion.div {...fadeInUp} className="mb-8">
               <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                Elevate Your Stream with{" "}
+                Elevate Your Albion Stream with{" "}
                 <SparklesText
                   className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent"
                   colors={{
@@ -104,8 +104,8 @@ function LandingPage(): React.ReactElement {
               transition={{ delay: 0.2 }}
               className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed"
             >
-              Create stunning, interactive overlays for your streams with real-time data integration,
-              custom animations, and professional layouts that captivate and engage your audience.
+              Create stunning Albion Online stream overlays with real-time game integration,
+              Twitch bit interactions, and professional layouts that captivate your audience.
             </motion.p>
 
             <motion.div

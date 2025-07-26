@@ -61,9 +61,9 @@ export default function OverlaysPage(): React.ReactElement {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Overlays</h1>
+          <h1 className="text-2xl font-bold">Albion Online Overlays</h1>
           <p className="text-muted-foreground">
-            Manage your stream overlays for different games
+            Manage your Albion Online stream overlays for OBS and streaming platforms
           </p>
         </div>
         <Button>
@@ -75,7 +75,7 @@ export default function OverlaysPage(): React.ReactElement {
         <div className="border rounded-lg p-8 text-center">
           <p className="text-muted-foreground mb-4">No overlays available yet.</p>
           <p className="text-sm text-muted-foreground">
-            Create your first action to automatically generate an Albion Online overlay.
+            Create your first Albion Online action to automatically generate your overlay.
           </p>
         </div>
       ) : (
@@ -97,7 +97,12 @@ export default function OverlaysPage(): React.ReactElement {
 
                 return (
                   <TableRow key={overlay.id}>
-                    <TableCell className="font-medium">{overlay.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-orange-500 rounded"></div>
+                        Albion Online
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <Badge
                         variant={overlay.isActive ? "default" : "secondary"}

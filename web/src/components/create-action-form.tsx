@@ -140,6 +140,26 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="game">Game</Label>
+              <Select value="albion-online" disabled>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select game" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="albion-online">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-orange-500 rounded"></div>
+                      Albion Online
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="text-xs text-muted-foreground">
+                Currently only Albion Online is supported
+              </div>
+            </div>
+
             <AlbionItemSelector
               selectedItem={selectedAlbionItem}
               onItemSelect={(item) => {
