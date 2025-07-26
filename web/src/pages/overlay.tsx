@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { SparklesText } from "@/components/magicui/sparkles-text";
 import { useParams } from "react-router-dom";
 
 interface AlbionItem {
