@@ -45,7 +45,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
   });
 
   const [selectedAlbionItem, setSelectedAlbionItem] = useState<AlbionItem | null>(null);
-  const [selectedQuality, setSelectedQuality] = useState<number>(0);
+  const [selectedQuality, setSelectedQuality] = useState<number>(1);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -73,7 +73,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
             uniqueName: selectedAlbionItem.UniqueName,
             name: selectedAlbionItem.LocalizedNames["EN-US"],
             quality: selectedQuality,
-            imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png${selectedQuality > 1 ? `?quality=${selectedQuality - 1}` : ''}`,
+            imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png?quality=${selectedQuality}`,
           } : null,
         },
       };
@@ -144,7 +144,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
               selectedItem={selectedAlbionItem}
               onItemSelect={(item) => {
                 setSelectedAlbionItem(item);
-                setSelectedQuality(0); // Reset quality when changing item
+                setSelectedQuality(1); // Reset quality when changing item
               }}
               placeholder="Select an Albion item for the overlay..."
             />
@@ -161,10 +161,10 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="1">Normal</SelectItem>
-                    <SelectItem value="2">Good (.1)</SelectItem>
-                    <SelectItem value="3">Outstanding (.2)</SelectItem>
-                    <SelectItem value="4">Excellent (.3)</SelectItem>
-                    <SelectItem value="5">Masterpiece (.4)</SelectItem>
+                    <SelectItem value="2">Good</SelectItem>
+                    <SelectItem value="3">Outstanding</SelectItem>
+                    <SelectItem value="4">Excellent</SelectItem>
+                    <SelectItem value="5">Masterpiece</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="text-xs text-muted-foreground">
@@ -266,7 +266,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                     uniqueName: selectedAlbionItem.UniqueName,
                     name: selectedAlbionItem.LocalizedNames["EN-US"],
                     quality: selectedQuality,
-                    imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png${selectedQuality > 1 ? `?quality=${selectedQuality - 1}` : ''}`,
+                    imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png?quality=${selectedQuality}`,
                   } : undefined}
                 />
               </div>
@@ -284,10 +284,10 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                     <span>Quality:</span>
                     <Badge variant="outline" className="text-xs">
                       {selectedQuality === 1 ? "Normal" : 
-                       selectedQuality === 2 ? "Good (.1)" :
-                       selectedQuality === 3 ? "Outstanding (.2)" :
-                       selectedQuality === 4 ? "Excellent (.3)" :
-                       selectedQuality === 5 ? "Masterpiece (.4)" : "Normal"}
+                       selectedQuality === 2 ? "Good" :
+                       selectedQuality === 3 ? "Outstanding" :
+                       selectedQuality === 4 ? "Excellent" :
+                       selectedQuality === 5 ? "Masterpiece" : "Normal"}
                     </Badge>
                   </div>
                 )}

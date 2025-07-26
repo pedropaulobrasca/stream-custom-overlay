@@ -402,59 +402,45 @@ export default function OverlayPage(): React.ReactElement {
           {triggeredActions.map((action, index) => (
             <div
               key={`${action.id}-${action.triggeredAt.getTime()}`}
-              className="relative"
+              className="bg-green-600 rounded-lg p-2 flex items-center gap-2 animate-pulse border-2 border-green-400"
               style={{
                 animationDelay: `${index * 0.2}s`,
+                animationDuration: "2s",
               }}
             >
-              {/* Notification Card */}
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl border-4 border-green-300 shadow-2xl shadow-green-500/50 p-4 animate-bounce">
-                {/* Floating Item */}
-                <div className="absolute -top-4 -left-4 z-10">
-                  <div className="bg-yellow-400 w-12 h-12 rounded-full border-4 border-yellow-200 shadow-xl overflow-hidden flex items-center justify-center">
-                    {action.config.albionItem ? (
-                      <img 
-                        src={action.config.albionItem.imageUrl}
-                        alt={action.config.albionItem.name}
-                        className="w-full h-full object-cover scale-110"
-                        onError={(e) => {
-                          const target = e.currentTarget as HTMLImageElement;
-                          target.style.display = 'none';
-                          const sibling = target.nextElementSibling as HTMLElement;
-                          if (sibling) sibling.style.display = 'block';
-                        }}
-                      />
-                    ) : null}
-                    <div className={`text-lg ${action.config.albionItem ? 'hidden' : 'block'}`}>
-                      {action.config.emoji}
-                    </div>
-                  </div>
+              <div className="w-8 h-8 rounded-lg overflow-hidden bg-green-700 flex items-center justify-center">
+                {action.config.albionItem ? (
+                  <img 
+                    src={action.config.albionItem.imageUrl}
+                    alt={action.config.albionItem.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.style.display = 'none';
+                      const sibling = target.nextElementSibling as HTMLElement;
+                      if (sibling) sibling.style.display = 'block';
+                    }}
+                  />
+                ) : null}
+                <div className={`text-sm ${action.config.albionItem ? 'hidden' : 'block'}`}>
+                  {action.config.emoji}
                 </div>
-
-                {/* Content */}
-                <div className="ml-4 text-center">
-                  <div className="text-white font-black text-sm drop-shadow-lg tracking-wide">
-                    🎉 {action.name.toUpperCase()}
-                  </div>
-                  <div className="text-green-100 text-xs font-bold">
-                    ACTIVATED!
-                  </div>
-                  <div className="bg-yellow-400 text-black rounded-full px-3 py-1 mt-1 text-xs font-black">
-                    💎 {action.bitsReceived} from {action.triggeredBy}
-                  </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-white text-xs font-bold truncate">
+                  {action.name} ✓
                 </div>
-
-                {/* Sparkles */}
-                <div className="absolute -top-1 -right-1 text-yellow-300 text-lg animate-spin">✨</div>
-                <div className="absolute -bottom-1 -left-1 text-blue-300 text-sm animate-pulse">⭐</div>
+                <div className="text-green-200 text-xs">
+                  {action.bitsReceived} bits
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Cartoonized Actions List */}
-      <div className="flex flex-col gap-3 max-w-[280px]">
+      {/* Minimal Floating Items */}
+      <div className="flex flex-col gap-4 max-w-[120px]">
         {actions.map((action) => {
           const isTriggered = triggeredActions.some(ta => ta.id === action.id);
           const timer = actionTimers[action.id];
@@ -471,95 +457,68 @@ export default function OverlayPage(): React.ReactElement {
           return (
             <div
               key={action.id}
-              className="relative"
+              className="relative flex flex-col items-center"
             >
-              {/* Main Card */}
+              {/* Main Item Image */}
               <div className={`${
-                isActive
-                  ? "bg-gradient-to-r from-red-600 to-red-700 border-red-400 shadow-red-500/50"
-                  : isTriggered
-                    ? "bg-gradient-to-r from-green-600 to-green-700 border-green-400 shadow-green-500/50"
-                    : "bg-gradient-to-r from-blue-600 to-purple-600 border-blue-400 shadow-blue-500/50"
-              } rounded-xl border-4 shadow-2xl backdrop-blur-sm transition-all duration-300 relative overflow-hidden pt-8 pb-4 px-4`}
-              >
-                {/* Floating Item Image */}
-                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
-                  <div className={`${
-                    isActive ? "bg-red-800 border-red-300" : 
-                    isTriggered ? "bg-green-800 border-green-300" : "bg-purple-800 border-purple-300"
-                  } w-16 h-16 rounded-full border-4 shadow-2xl overflow-hidden flex items-center justify-center transition-all duration-300`}>
-                    {isActive ? (
-                      <div className="text-3xl animate-pulse">🚫</div>
-                    ) : action.config.albionItem ? (
-                      <img 
-                        src={action.config.albionItem.imageUrl}
-                        alt={action.config.albionItem.name}
-                        className="w-full h-full object-cover scale-110"
-                        onError={(e) => {
-                          const target = e.currentTarget as HTMLImageElement;
-                          target.style.display = 'none';
-                          const sibling = target.nextElementSibling as HTMLElement;
-                          if (sibling) sibling.style.display = 'block';
-                        }}
-                      />
-                    ) : null}
-                    <div className={`text-2xl ${isActive || !action.config.albionItem ? 'block' : 'hidden'}`}>
-                      {isActive ? '' : action.config.emoji}
-                    </div>
-                  </div>
+                isActive ? "ring-4 ring-red-400 bg-red-800" : 
+                isTriggered ? "ring-4 ring-green-400 bg-green-800" : "ring-2 ring-white/20 bg-black/20"
+              } w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group hover:scale-110`}>
+                {action.config.albionItem ? (
+                  <img 
+                    src={action.config.albionItem.imageUrl}
+                    alt={action.config.albionItem.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.style.display = 'none';
+                      const sibling = target.nextElementSibling as HTMLElement;
+                      if (sibling) sibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className={`w-full h-full flex items-center justify-center text-xl ${!action.config.albionItem ? 'flex' : 'hidden'}`}>
+                  {action.config.emoji}
                 </div>
 
-                {/* Card Content */}
-                <div className="text-center mt-2">
-                  {/* Action Name */}
-                  <h3 className="text-white font-black text-lg leading-tight mb-2 drop-shadow-lg tracking-wide">
-                    {action.name.toUpperCase()}
-                  </h3>
-                  
-                  {/* Status/Timer */}
-                  {isActive ? (
-                    <div className="bg-black/40 rounded-full px-4 py-2 mb-2">
-                      <div className="text-red-300 font-bold text-xl drop-shadow-lg">
-                        ⏰ {formatTime(remainingSeconds)}
-                      </div>
-                      <div className="text-red-200 text-xs font-semibold">
-                        BLOCKED!
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-yellow-400 text-black rounded-full px-4 py-2 mb-2">
-                      <div className="font-black text-lg drop-shadow-md">
-                        💎 {action.config.bitCost} BITS
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Animated Timer Bar */}
+                {/* Timer Overlay */}
                 {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-2 bg-black/30">
-                    <div
-                      className="h-2 bg-gradient-to-r from-yellow-400 to-red-400 transition-all duration-1000 ease-out animate-pulse"
-                      style={{
-                        width: `${Math.max(0, (remainingSeconds / (action.config.duration * 60)) * 100)}%`,
-                      }}
-                    />
+                  <div className="absolute inset-0 bg-red-900/80 flex flex-col items-center justify-center">
+                    <div className="text-white text-xs font-bold">
+                      {formatTime(remainingSeconds)}
+                    </div>
                   </div>
-                )}
-
-                {/* Decorative Elements */}
-                <div className="absolute top-2 left-2 text-white/20 text-xs font-bold">
-                  #{action.id.slice(-4)}
-                </div>
-                
-                {/* Sparkle Effects */}
-                {!isActive && (
-                  <>
-                    <div className="absolute top-3 right-3 text-yellow-300 text-sm animate-pulse">✨</div>
-                    <div className="absolute bottom-3 left-3 text-blue-300 text-sm animate-pulse delay-1000">⭐</div>
-                  </>
                 )}
               </div>
+
+              {/* Compact Info */}
+              <div className="mt-2 text-center">
+                <div className="text-white text-xs font-bold truncate max-w-[100px] drop-shadow-lg">
+                  {action.name}
+                </div>
+                {isActive && timer?.triggeredBy && (
+                  <div className="text-red-300 text-xs font-medium">
+                    by {timer.triggeredBy}
+                  </div>
+                )}
+                {!isActive && (
+                  <div className="text-yellow-400 text-xs font-bold">
+                    {action.config.bitCost} bits
+                  </div>
+                )}
+              </div>
+
+              {/* Simple Timer Bar */}
+              {isActive && (
+                <div className="w-full h-1 bg-black/30 rounded-full mt-1 overflow-hidden">
+                  <div
+                    className="h-full bg-red-400 transition-all duration-1000 ease-out"
+                    style={{
+                      width: `${Math.max(0, (remainingSeconds / (action.config.duration * 60)) * 100)}%`,
+                    }}
+                  />
+                </div>
+              )}
             </div>
           );
         })}

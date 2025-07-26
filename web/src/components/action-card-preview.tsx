@@ -17,42 +17,36 @@ interface ActionCardPreviewProps {
 
 export function ActionCardPreview({ name, description, emoji, bitCost, albionItem }: ActionCardPreviewProps) {
   return (
-    <div className="bg-slate-700 text-white rounded-lg p-4 flex items-center gap-3 max-w-md">
-      <div className="min-w-[64px] h-[64px] rounded-lg overflow-hidden bg-gray-600 flex items-center justify-center">
+    <div className="relative flex flex-col items-center">
+      {/* Main Item Image - matching overlay style */}
+      <div className="ring-2 ring-white/20 bg-black/20 w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group hover:scale-110">
         {albionItem ? (
           <img 
             src={albionItem.imageUrl}
             alt={albionItem.name}
             className="w-full h-full object-cover"
             onError={(e) => {
-              // Fallback to emoji if image fails to load
               const target = e.currentTarget as HTMLImageElement;
               target.style.display = 'none';
               const sibling = target.nextElementSibling as HTMLElement;
-              if (sibling) sibling.style.display = 'block';
+              if (sibling) sibling.style.display = 'flex';
             }}
           />
         ) : null}
-        <div className={`text-4xl ${albionItem ? 'hidden' : 'block'}`}>
+        <div className={`w-full h-full flex items-center justify-center text-xl ${!albionItem ? 'flex' : 'hidden'}`}>
           {emoji || "⚡"}
         </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-sm truncate">
+
+      {/* Compact Info - matching overlay style */}
+      <div className="mt-2 text-center">
+        <div className="text-white text-xs font-bold truncate max-w-[100px] drop-shadow-lg">
           {name || "Action Name"}
-        </h3>
-        {description && (
-          <p className="text-xs text-slate-300 truncate">
-            {description}
-          </p>
-        )}
+        </div>
+        <div className="text-yellow-400 text-xs font-bold">
+          {bitCost || 0} bits
+        </div>
       </div>
-      <Badge
-        variant="secondary"
-        className="bg-yellow-500 text-black hover:bg-yellow-500 text-xs font-medium px-2 py-1"
-      >
-        {bitCost || 0} bits
-      </Badge>
     </div>
   );
 }

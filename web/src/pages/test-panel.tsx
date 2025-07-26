@@ -261,8 +261,24 @@ export default function TestPanelPage() {
             <Card key={action.id}>
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="text-2xl bg-muted rounded-lg p-2 min-w-[48px] h-12 flex items-center justify-center">
-                    {emoji}
+                  {/* Matching overlay style */}
+                  <div className="ring-2 ring-white/20 bg-black/20 w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm relative">
+                    {action.config?.albionItem ? (
+                      <img 
+                        src={action.config.albionItem.imageUrl}
+                        alt={action.config.albionItem.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement;
+                          target.style.display = 'none';
+                          const sibling = target.nextElementSibling as HTMLElement;
+                          if (sibling) sibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div className={`w-full h-full flex items-center justify-center text-xl ${!action.config?.albionItem ? 'flex' : 'hidden'}`}>
+                      {emoji}
+                    </div>
                   </div>
                   <div className="flex-1">
                     <CardTitle className="text-lg">{action.name}</CardTitle>
