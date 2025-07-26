@@ -160,12 +160,12 @@ function ActionsPage() {
               {filteredActions.map((action) => (
                 <TableRow key={action.id}>
                   <TableCell>
-                    <div className="flex items-center justify-center h-12 w-12 rounded bg-muted">
+                    <div className="flex items-center justify-center h-12 w-12 rounded bg-muted overflow-hidden">
                       {action.config?.albionItem ? (
                         <img 
                           src={action.config.albionItem.imageUrl}
                           alt={action.config.albionItem.name}
-                          className="w-10 h-10 object-contain"
+                          className="w-full h-full object-cover"
                           onError={(e) => {
                             // Fallback to emoji if image fails to load
                             const target = e.currentTarget as HTMLImageElement;

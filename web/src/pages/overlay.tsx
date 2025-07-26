@@ -416,12 +416,12 @@ export default function OverlayPage(): React.ReactElement {
                 animationDuration: "2s",
               }}
             >
-              <div className="bg-green-700/50 rounded-lg p-2 min-w-[64px] h-16 flex items-center justify-center">
+              <div className="bg-green-700/50 rounded-lg min-w-[64px] h-16 overflow-hidden flex items-center justify-center">
                 {action.config.albionItem ? (
                   <img 
                     src={action.config.albionItem.imageUrl}
                     alt={action.config.albionItem.name}
-                    className="w-12 h-12 object-contain"
+                    className="w-full h-full object-cover"
                     onError={(e) => {
                       // Fallback to emoji if image fails to load
                       const target = e.currentTarget as HTMLImageElement;
@@ -486,14 +486,14 @@ export default function OverlayPage(): React.ReactElement {
               <div className="relative flex items-center gap-3">
                 <div className={`${
                   isActive ? "bg-red-700/50" : isTriggered ? "bg-green-700/50" : "bg-gray-700/50"
-                } rounded-lg p-2 min-w-[64px] h-16 flex items-center justify-center transition-all duration-500`}>
+                } rounded-lg min-w-[64px] h-16 overflow-hidden flex items-center justify-center transition-all duration-500`}>
                   {isActive ? (
                     <div className="text-4xl">🚫</div>
                   ) : action.config.albionItem ? (
                     <img 
                       src={action.config.albionItem.imageUrl}
                       alt={action.config.albionItem.name}
-                      className="w-12 h-12 object-contain"
+                      className="w-full h-full object-cover"
                       onError={(e) => {
                         // Fallback to emoji if image fails to load
                         const target = e.currentTarget as HTMLImageElement;
