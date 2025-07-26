@@ -61,37 +61,53 @@ export function AlbionItemSelector({
       .filter(item => 
         item.LocalizedNames?.["EN-US"] && 
         item.UniqueName &&
-        // Filter out some item types that might not be useful for streaming
+        // Filter out quest items and hideouts that are not useful for streaming
         !item.UniqueName.includes("UNIQUE_HIDEOUT") &&
         !item.UniqueName.includes("QUESTITEM") &&
-        // Focus on equipment, resources, and weapons
-        (item.UniqueName.includes("T") || 
-         item.UniqueName.includes("TOOL") ||
-         item.UniqueName.includes("WEAPON") ||
-         item.UniqueName.includes("ARMOR") ||
-         item.UniqueName.includes("BAG") ||
-         item.UniqueName.includes("CAPE") ||
-         item.UniqueName.includes("SHOES") ||
-         item.UniqueName.includes("HEAD") ||
-         item.UniqueName.includes("CHEST") ||
-         item.UniqueName.includes("OFF") ||
-         item.UniqueName.includes("2H") ||
-         item.UniqueName.includes("MAIN"))
+        !item.UniqueName.includes("PREMIUM") &&
+        // Keep most items - remove the overly restrictive filter
+        item.UniqueName.length > 0
       )
-      .slice(0, 500); // Limit to first 500 items for performance
+      .slice(0, 2000); // Increased limit for better coverage
   }, []);
 
   // Filter items based on search
   const filteredItems = useMemo(() => {
-    if (!searchTerm) return items.slice(0, 50); // Show first 50 when no search
+    if (!searchTerm) return items.slice(0, 100); // Show first 100 when no search
 
     const lowerSearch = searchTerm.toLowerCase();
+    const searchWords = lowerSearch.split(' ').filter(word => word.length > 0);
+    
     return items
-      .filter(item => 
-        item.LocalizedNames["EN-US"]?.toLowerCase().includes(lowerSearch) ||
-        item.UniqueName.toLowerCase().includes(lowerSearch)
-      )
-      .slice(0, 100); // Limit search results
+      .filter(item => {
+        const itemName = item.LocalizedNames["EN-US"]?.toLowerCase() || '';
+        const uniqueName = item.UniqueName.toLowerCase();
+        
+        // Check if all search words are found in either the name or unique name
+        return searchWords.every(word => 
+          itemName.includes(word) || uniqueName.includes(word)
+        );
+      })
+      .sort((a, b) => {
+        // Sort by relevance - exact matches first, then partial matches
+        const aName = a.LocalizedNames["EN-US"]?.toLowerCase() || '';
+        const bName = b.LocalizedNames["EN-US"]?.toLowerCase() || '';
+        
+        const aExactMatch = aName === lowerSearch;
+        const bExactMatch = bName === lowerSearch;
+        
+        if (aExactMatch && !bExactMatch) return -1;
+        if (!aExactMatch && bExactMatch) return 1;
+        
+        const aStartsWith = aName.startsWith(lowerSearch);
+        const bStartsWith = bName.startsWith(lowerSearch);
+        
+        if (aStartsWith && !bStartsWith) return -1;
+        if (!aStartsWith && bStartsWith) return 1;
+        
+        return aName.localeCompare(bName);
+      })
+      .slice(0, 200); // Increased limit for search results
   }, [items, searchTerm]);
 
   // Get tier from item name
@@ -198,7 +214,12 @@ export function AlbionItemSelector({
                 <div className="space-y-1">
                   {filteredItems.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
-                      {searchTerm ? "No items found" : "Loading items..."}
+                      {searchTerm ? `No items found for "${searchTerm}"` : "Loading items..."}
+                      {searchTerm && (
+                        <div className="text-xs mt-2">
+                          Try searching for: "axe", "sword", "bow", "staff", "bag", etc.
+                        </div>
+                      )}
                     </div>
                   ) : (
                     filteredItems.map((item) => (
