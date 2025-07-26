@@ -17,12 +17,12 @@ interface ActionCardPreviewProps {
 export function ActionCardPreview({ name, description, emoji, bitCost, albionItem }: ActionCardPreviewProps) {
   return (
     <div className="bg-slate-700 text-white rounded-lg p-4 flex items-center gap-3 max-w-md">
-      <div className="min-w-[48px] h-[48px] flex items-center justify-center">
+      <div className="min-w-[64px] h-[64px] flex items-center justify-center">
         {albionItem ? (
           <img 
             src={albionItem.imageUrl}
             alt={albionItem.name}
-            className="w-12 h-12 object-contain"
+            className="w-16 h-16 object-contain"
             onError={(e) => {
               // Fallback to emoji if image fails to load
               const target = e.currentTarget as HTMLImageElement;
@@ -32,7 +32,7 @@ export function ActionCardPreview({ name, description, emoji, bitCost, albionIte
             }}
           />
         ) : null}
-        <div className={`text-2xl ${albionItem ? 'hidden' : 'block'}`}>
+        <div className={`text-4xl ${albionItem ? 'hidden' : 'block'}`}>
           {emoji || "⚡"}
         </div>
       </div>
