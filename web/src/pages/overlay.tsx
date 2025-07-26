@@ -398,50 +398,63 @@ export default function OverlayPage(): React.ReactElement {
         </div>
       </div>
       {triggeredActions.length > 0 && (
-        <div className="fixed top-4 right-4 space-y-1 z-50">
+        <div className="fixed top-4 right-4 space-y-2 z-50">
           {triggeredActions.map((action, index) => (
             <div
               key={`${action.id}-${action.triggeredAt.getTime()}`}
-              className="bg-green-900/80 backdrop-blur-sm rounded border border-green-500/50 p-2 flex items-center gap-2 animate-pulse"
+              className="relative"
               style={{
                 animationDelay: `${index * 0.2}s`,
-                animationDuration: "2s",
               }}
             >
-              <div className="bg-green-700/60 rounded w-6 h-6 overflow-hidden flex items-center justify-center">
-                {action.config.albionItem ? (
-                  <img 
-                    src={action.config.albionItem.imageUrl}
-                    alt={action.config.albionItem.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // Fallback to emoji if image fails to load
-                      const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = 'none';
-                      const sibling = target.nextElementSibling as HTMLElement;
-                      if (sibling) sibling.style.display = 'block';
-                    }}
-                  />
-                ) : null}
-                <div className={`text-sm ${action.config.albionItem ? 'hidden' : 'block'}`}>
-                  {action.config.emoji}
+              {/* Notification Card */}
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl border-4 border-green-300 shadow-2xl shadow-green-500/50 p-4 animate-bounce">
+                {/* Floating Item */}
+                <div className="absolute -top-4 -left-4 z-10">
+                  <div className="bg-yellow-400 w-12 h-12 rounded-full border-4 border-yellow-200 shadow-xl overflow-hidden flex items-center justify-center">
+                    {action.config.albionItem ? (
+                      <img 
+                        src={action.config.albionItem.imageUrl}
+                        alt={action.config.albionItem.name}
+                        className="w-full h-full object-cover scale-110"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement;
+                          target.style.display = 'none';
+                          const sibling = target.nextElementSibling as HTMLElement;
+                          if (sibling) sibling.style.display = 'block';
+                        }}
+                      />
+                    ) : null}
+                    <div className={`text-lg ${action.config.albionItem ? 'hidden' : 'block'}`}>
+                      {action.config.emoji}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-white text-xs font-medium truncate">
-                  {action.name}
+
+                {/* Content */}
+                <div className="ml-4 text-center">
+                  <div className="text-white font-black text-sm drop-shadow-lg tracking-wide">
+                    🎉 {action.name.toUpperCase()}
+                  </div>
+                  <div className="text-green-100 text-xs font-bold">
+                    ACTIVATED!
+                  </div>
+                  <div className="bg-yellow-400 text-black rounded-full px-3 py-1 mt-1 text-xs font-black">
+                    💎 {action.bitsReceived} from {action.triggeredBy}
+                  </div>
                 </div>
-                <div className="text-green-200 text-xs truncate">
-                  {action.bitsReceived} from {action.triggeredBy}
-                </div>
+
+                {/* Sparkles */}
+                <div className="absolute -top-1 -right-1 text-yellow-300 text-lg animate-spin">✨</div>
+                <div className="absolute -bottom-1 -left-1 text-blue-300 text-sm animate-pulse">⭐</div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Minimal Actions List */}
-      <div className="flex flex-col gap-2 max-w-[200px]">
+      {/* Cartoonized Actions List */}
+      <div className="flex flex-col gap-3 max-w-[280px]">
         {actions.map((action) => {
           const isTriggered = triggeredActions.some(ta => ta.id === action.id);
           const timer = actionTimers[action.id];
@@ -458,76 +471,95 @@ export default function OverlayPage(): React.ReactElement {
           return (
             <div
               key={action.id}
-              className={`${
-                isActive
-                  ? "bg-red-900/60 border-red-500/60"
-                  : isTriggered
-                    ? "bg-green-900/60 border-green-500/60"
-                    : "bg-black/40 border-white/10"
-              } backdrop-blur-sm rounded-md border transition-all duration-300 relative overflow-hidden`}
+              className="relative"
             >
-              {/* Timer Background */}
-              {isActive && (
-                <div className="absolute inset-0 bg-red-500/10 animate-pulse" />
-              )}
-
-              <div className="relative flex items-center gap-2 p-2">
-                {/* Minimal Icon */}
-                <div className={`${
-                  isActive ? "bg-red-600/80" : isTriggered ? "bg-green-600/80" : "bg-gray-600/60"
-                } rounded w-8 h-8 overflow-hidden flex items-center justify-center transition-all duration-300`}>
-                  {isActive ? (
-                    <div className="text-lg">🚫</div>
-                  ) : action.config.albionItem ? (
-                    <img 
-                      src={action.config.albionItem.imageUrl}
-                      alt={action.config.albionItem.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        // Fallback to emoji if image fails to load
-                        const target = e.currentTarget as HTMLImageElement;
-                        target.style.display = 'none';
-                        const sibling = target.nextElementSibling as HTMLElement;
-                        if (sibling) sibling.style.display = 'block';
-                      }}
-                    />
-                  ) : null}
-                  <div className={`text-sm ${isActive || !action.config.albionItem ? 'block' : 'hidden'}`}>
-                    {isActive ? '' : action.config.emoji}
+              {/* Main Card */}
+              <div className={`${
+                isActive
+                  ? "bg-gradient-to-r from-red-600 to-red-700 border-red-400 shadow-red-500/50"
+                  : isTriggered
+                    ? "bg-gradient-to-r from-green-600 to-green-700 border-green-400 shadow-green-500/50"
+                    : "bg-gradient-to-r from-blue-600 to-purple-600 border-blue-400 shadow-blue-500/50"
+              } rounded-xl border-4 shadow-2xl backdrop-blur-sm transition-all duration-300 relative overflow-hidden pt-8 pb-4 px-4`}
+              >
+                {/* Floating Item Image */}
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
+                  <div className={`${
+                    isActive ? "bg-red-800 border-red-300" : 
+                    isTriggered ? "bg-green-800 border-green-300" : "bg-purple-800 border-purple-300"
+                  } w-16 h-16 rounded-full border-4 shadow-2xl overflow-hidden flex items-center justify-center transition-all duration-300`}>
+                    {isActive ? (
+                      <div className="text-3xl animate-pulse">🚫</div>
+                    ) : action.config.albionItem ? (
+                      <img 
+                        src={action.config.albionItem.imageUrl}
+                        alt={action.config.albionItem.name}
+                        className="w-full h-full object-cover scale-110"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement;
+                          target.style.display = 'none';
+                          const sibling = target.nextElementSibling as HTMLElement;
+                          if (sibling) sibling.style.display = 'block';
+                        }}
+                      />
+                    ) : null}
+                    <div className={`text-2xl ${isActive || !action.config.albionItem ? 'block' : 'hidden'}`}>
+                      {isActive ? '' : action.config.emoji}
+                    </div>
                   </div>
                 </div>
 
-                {/* Minimal Text */}
-                <div className="flex-1 min-w-0">
-                  <div className="text-white text-xs font-medium truncate">
-                    {action.name}
-                  </div>
-                  {isActive && (
-                    <div className="text-red-300 text-xs">
-                      {formatTime(remainingSeconds)}
+                {/* Card Content */}
+                <div className="text-center mt-2">
+                  {/* Action Name */}
+                  <h3 className="text-white font-black text-lg leading-tight mb-2 drop-shadow-lg tracking-wide">
+                    {action.name.toUpperCase()}
+                  </h3>
+                  
+                  {/* Status/Timer */}
+                  {isActive ? (
+                    <div className="bg-black/40 rounded-full px-4 py-2 mb-2">
+                      <div className="text-red-300 font-bold text-xl drop-shadow-lg">
+                        ⏰ {formatTime(remainingSeconds)}
+                      </div>
+                      <div className="text-red-200 text-xs font-semibold">
+                        BLOCKED!
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-yellow-400 text-black rounded-full px-4 py-2 mb-2">
+                      <div className="font-black text-lg drop-shadow-md">
+                        💎 {action.config.bitCost} BITS
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {/* Minimal Bits */}
-                {!isActive && (
-                  <div className="text-yellow-400 text-xs font-bold">
-                    {action.config.bitCost}
+                {/* Animated Timer Bar */}
+                {isActive && (
+                  <div className="absolute bottom-0 left-0 right-0 h-2 bg-black/30">
+                    <div
+                      className="h-2 bg-gradient-to-r from-yellow-400 to-red-400 transition-all duration-1000 ease-out animate-pulse"
+                      style={{
+                        width: `${Math.max(0, (remainingSeconds / (action.config.duration * 60)) * 100)}%`,
+                      }}
+                    />
                   </div>
                 )}
-              </div>
 
-              {/* Minimal Timer Bar */}
-              {isActive && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-700/50">
-                  <div
-                    className="bg-red-400 h-0.5 transition-all duration-1000 ease-out"
-                    style={{
-                      width: `${Math.max(0, (remainingSeconds / (action.config.duration * 60)) * 100)}%`,
-                    }}
-                  />
+                {/* Decorative Elements */}
+                <div className="absolute top-2 left-2 text-white/20 text-xs font-bold">
+                  #{action.id.slice(-4)}
                 </div>
-              )}
+                
+                {/* Sparkle Effects */}
+                {!isActive && (
+                  <>
+                    <div className="absolute top-3 right-3 text-yellow-300 text-sm animate-pulse">✨</div>
+                    <div className="absolute bottom-3 left-3 text-blue-300 text-sm animate-pulse delay-1000">⭐</div>
+                  </>
+                )}
+              </div>
             </div>
           );
         })}

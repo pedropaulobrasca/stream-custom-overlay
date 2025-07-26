@@ -73,7 +73,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
             uniqueName: selectedAlbionItem.UniqueName,
             name: selectedAlbionItem.LocalizedNames["EN-US"],
             quality: selectedQuality,
-            imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png${selectedQuality > 0 ? `?quality=${selectedQuality}` : ''}`,
+            imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png${selectedQuality > 1 ? `?quality=${selectedQuality - 1}` : ''}`,
           } : null,
         },
       };
@@ -160,11 +160,11 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                     <SelectValue placeholder="Select quality" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Normal</SelectItem>
-                    <SelectItem value="1">Good (.1)</SelectItem>
-                    <SelectItem value="2">Outstanding (.2)</SelectItem>
-                    <SelectItem value="3">Excellent (.3)</SelectItem>
-                    <SelectItem value="4">Masterpiece (.4)</SelectItem>
+                    <SelectItem value="1">Normal</SelectItem>
+                    <SelectItem value="2">Good (.1)</SelectItem>
+                    <SelectItem value="3">Outstanding (.2)</SelectItem>
+                    <SelectItem value="4">Excellent (.3)</SelectItem>
+                    <SelectItem value="5">Masterpiece (.4)</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="text-xs text-muted-foreground">
@@ -266,7 +266,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                     uniqueName: selectedAlbionItem.UniqueName,
                     name: selectedAlbionItem.LocalizedNames["EN-US"],
                     quality: selectedQuality,
-                    imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png${selectedQuality > 0 ? `?quality=${selectedQuality}` : ''}`,
+                    imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png${selectedQuality > 1 ? `?quality=${selectedQuality - 1}` : ''}`,
                   } : undefined}
                 />
               </div>
@@ -283,11 +283,11 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   <div className="flex justify-between">
                     <span>Quality:</span>
                     <Badge variant="outline" className="text-xs">
-                      {selectedQuality === 0 ? "Normal" : 
-                       selectedQuality === 1 ? "Good (.1)" :
-                       selectedQuality === 2 ? "Outstanding (.2)" :
-                       selectedQuality === 3 ? "Excellent (.3)" :
-                       selectedQuality === 4 ? "Masterpiece (.4)" : "Normal"}
+                      {selectedQuality === 1 ? "Normal" : 
+                       selectedQuality === 2 ? "Good (.1)" :
+                       selectedQuality === 3 ? "Outstanding (.2)" :
+                       selectedQuality === 4 ? "Excellent (.3)" :
+                       selectedQuality === 5 ? "Masterpiece (.4)" : "Normal"}
                     </Badge>
                   </div>
                 )}
