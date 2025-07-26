@@ -68,7 +68,7 @@ export function AlbionItemSelector({
         // Keep most items - remove the overly restrictive filter
         item.UniqueName.length > 0
       )
-      .slice(0, 2000); // Increased limit for better coverage
+      .slice(0, 3000); // Increased limit for better coverage
   }, []);
 
   // Filter items based on search
