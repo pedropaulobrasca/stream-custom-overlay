@@ -1,17 +1,40 @@
 import { Badge } from "@/components/ui/badge";
 
+interface AlbionItem {
+  uniqueName: string;
+  name: string;
+  imageUrl: string;
+}
+
 interface ActionCardPreviewProps {
   name: string;
   description: string;
   emoji: string;
   bitCost: number;
+  albionItem?: AlbionItem;
 }
 
-export function ActionCardPreview({ name, description, emoji, bitCost }: ActionCardPreviewProps) {
+export function ActionCardPreview({ name, description, emoji, bitCost, albionItem }: ActionCardPreviewProps) {
   return (
     <div className="bg-slate-700 text-white rounded-lg p-4 flex items-center gap-3 max-w-md">
-      <div className="text-2xl min-w-[32px]">
-        {emoji || "⚡"}
+      <div className="min-w-[40px] h-[40px] flex items-center justify-center">
+        {albionItem ? (
+          <img 
+            src={albionItem.imageUrl}
+            alt={albionItem.name}
+            className="w-8 h-8 object-contain"
+            onError={(e) => {
+              // Fallback to emoji if image fails to load
+              const target = e.currentTarget as HTMLImageElement;
+              target.style.display = 'none';
+              const sibling = target.nextElementSibling as HTMLElement;
+              if (sibling) sibling.style.display = 'block';
+            }}
+          />
+        ) : null}
+        <div className={`text-2xl ${albionItem ? 'hidden' : 'block'}`}>
+          {emoji || "⚡"}
+        </div>
       </div>
       <div className="flex-1 min-w-0">
         <h3 className="font-medium text-sm truncate">

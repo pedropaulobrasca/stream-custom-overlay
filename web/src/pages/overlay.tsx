@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import { SparklesText } from "@/components/magicui/sparkles-text";
 import { useParams } from "react-router-dom";
 
+interface AlbionItem {
+  uniqueName: string;
+  name: string;
+  imageUrl: string;
+}
+
 interface Action {
   id: string;
   name: string;
@@ -10,6 +16,7 @@ interface Action {
     emoji: string;
     bitCost: number;
     duration: number;
+    albionItem?: AlbionItem;
   };
   isActive: boolean;
 }
@@ -409,8 +416,24 @@ export default function OverlayPage(): React.ReactElement {
                 animationDuration: "2s",
               }}
             >
-              <div className="text-2xl bg-green-700/50 rounded-lg p-2 min-w-[48px] h-12 flex items-center justify-center">
-                {action.config.emoji}
+              <div className="bg-green-700/50 rounded-lg p-2 min-w-[48px] h-12 flex items-center justify-center">
+                {action.config.albionItem ? (
+                  <img 
+                    src={action.config.albionItem.imageUrl}
+                    alt={action.config.albionItem.name}
+                    className="w-8 h-8 object-contain"
+                    onError={(e) => {
+                      // Fallback to emoji if image fails to load
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.style.display = 'none';
+                      const sibling = target.nextElementSibling as HTMLElement;
+                      if (sibling) sibling.style.display = 'block';
+                    }}
+                  />
+                ) : null}
+                <div className={`text-2xl ${action.config.albionItem ? 'hidden' : 'block'}`}>
+                  {action.config.emoji}
+                </div>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-white font-medium text-sm truncate">
@@ -461,10 +484,28 @@ export default function OverlayPage(): React.ReactElement {
               )}
 
               <div className="relative flex items-center gap-3">
-                <div className={`text-2xl ${
+                <div className={`${
                   isActive ? "bg-red-700/50" : isTriggered ? "bg-green-700/50" : "bg-gray-700/50"
                 } rounded-lg p-2 min-w-[48px] h-12 flex items-center justify-center transition-all duration-500`}>
-                  {isActive ? "🚫" : action.config.emoji}
+                  {isActive ? (
+                    <div className="text-2xl">🚫</div>
+                  ) : action.config.albionItem ? (
+                    <img 
+                      src={action.config.albionItem.imageUrl}
+                      alt={action.config.albionItem.name}
+                      className="w-8 h-8 object-contain"
+                      onError={(e) => {
+                        // Fallback to emoji if image fails to load
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.style.display = 'none';
+                        const sibling = target.nextElementSibling as HTMLElement;
+                        if (sibling) sibling.style.display = 'block';
+                      }}
+                    />
+                  ) : null}
+                  <div className={`text-2xl ${isActive || !action.config.albionItem ? 'block' : 'hidden'}`}>
+                    {isActive ? '' : action.config.emoji}
+                  </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-white font-medium text-sm truncate">

@@ -160,8 +160,24 @@ function ActionsPage() {
               {filteredActions.map((action) => (
                 <TableRow key={action.id}>
                   <TableCell>
-                    <div className="flex items-center justify-center h-8 w-8 rounded bg-muted text-lg">
-                      {action.config?.emoji || "⚡"}
+                    <div className="flex items-center justify-center h-10 w-10 rounded bg-muted">
+                      {action.config?.albionItem ? (
+                        <img 
+                          src={action.config.albionItem.imageUrl}
+                          alt={action.config.albionItem.name}
+                          className="w-8 h-8 object-contain"
+                          onError={(e) => {
+                            // Fallback to emoji if image fails to load
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            const sibling = target.nextElementSibling as HTMLElement;
+                            if (sibling) sibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div className={`text-lg flex items-center justify-center w-full h-full ${action.config?.albionItem ? 'hidden' : 'flex'}`}>
+                        {action.config?.emoji || "⚡"}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">{action.name}</TableCell>

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ActionCardPreview } from "./action-card-preview";
+import { AlbionItemSelector } from "./albion/albion-item-selector";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -13,6 +14,17 @@ import { Loader2 } from "lucide-react";
 interface CreateActionFormProps {
   onActionCreated?: () => void;
   onCancel?: () => void;
+}
+
+interface AlbionItem {
+  UniqueName: string;
+  LocalizedNames: {
+    "EN-US": string;
+  };
+  LocalizedDescriptions?: {
+    "EN-US": string;
+  };
+  Index: string;
 }
 
 export function CreateActionForm({ onActionCreated, onCancel }: CreateActionFormProps) {
@@ -24,6 +36,8 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
     duration: 5,
     type: "albion-resource-block",
   });
+
+  const [selectedAlbionItem, setSelectedAlbionItem] = useState<AlbionItem | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -47,6 +61,11 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
           bitCost: formData.bitCost,
           duration: formData.duration,
           game: "albion-online",
+          albionItem: selectedAlbionItem ? {
+            uniqueName: selectedAlbionItem.UniqueName,
+            name: selectedAlbionItem.LocalizedNames["EN-US"],
+            imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png`,
+          } : null,
         },
       };
 
@@ -63,6 +82,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
         duration: 5,
         type: "albion-resource-block",
       });
+      setSelectedAlbionItem(null);
 
       onActionCreated?.();
     } catch (error: any) {
@@ -110,8 +130,17 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
               />
             </div>
 
+            <AlbionItemSelector
+              selectedItem={selectedAlbionItem}
+              onItemSelect={setSelectedAlbionItem}
+              placeholder="Select an Albion item for the overlay..."
+            />
+
             <div className="space-y-2">
-              <Label>Emoji/Icon</Label>
+              <Label>Fallback Emoji/Icon</Label>
+              <div className="text-sm text-muted-foreground mb-2">
+                Will be used if no Albion item is selected
+              </div>
               <div className="flex items-center gap-2 mb-2">
                 <Input
                   value={formData.emoji}
@@ -196,6 +225,11 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   description={formData.description}
                   emoji={formData.emoji}
                   bitCost={formData.bitCost}
+                  albionItem={selectedAlbionItem ? {
+                    uniqueName: selectedAlbionItem.UniqueName,
+                    name: selectedAlbionItem.LocalizedNames["EN-US"],
+                    imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png`,
+                  } : undefined}
                 />
               </div>
             </div>
