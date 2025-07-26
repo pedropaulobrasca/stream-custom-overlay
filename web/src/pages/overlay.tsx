@@ -392,31 +392,23 @@ export default function OverlayPage(): React.ReactElement {
 
   return (
     <div className="min-h-screen bg-transparent p-4 flex justify-center flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <SparklesText className="italic text-4xl text-white">
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-white/60 text-lg font-light italic">
           Overaction
-        </SparklesText>
-
-        {/* Manual sync button for OBS */}
-        {/* <button
-          onClick={forceRefresh}
-          className="bg-blue-600/80 hover:bg-blue-700/80 text-white px-3 py-1 rounded text-sm border border-blue-500/50"
-        >
-          🔄 Sync
-        </button> */}
+        </div>
       </div>
       {triggeredActions.length > 0 && (
-        <div className="fixed top-4 right-4 space-y-2 z-50">
+        <div className="fixed top-4 right-4 space-y-1 z-50">
           {triggeredActions.map((action, index) => (
             <div
               key={`${action.id}-${action.triggeredAt.getTime()}`}
-              className="bg-green-600/90 backdrop-blur-sm rounded-lg p-3 flex items-center gap-3 border border-green-500/50 shadow-lg animate-pulse"
+              className="bg-green-900/80 backdrop-blur-sm rounded border border-green-500/50 p-2 flex items-center gap-2 animate-pulse"
               style={{
                 animationDelay: `${index * 0.2}s`,
                 animationDuration: "2s",
               }}
             >
-              <div className="bg-green-700/50 rounded-lg min-w-[64px] h-16 overflow-hidden flex items-center justify-center">
+              <div className="bg-green-700/60 rounded w-6 h-6 overflow-hidden flex items-center justify-center">
                 {action.config.albionItem ? (
                   <img 
                     src={action.config.albionItem.imageUrl}
@@ -431,34 +423,30 @@ export default function OverlayPage(): React.ReactElement {
                     }}
                   />
                 ) : null}
-                <div className={`text-3xl ${action.config.albionItem ? 'hidden' : 'block'}`}>
+                <div className={`text-sm ${action.config.albionItem ? 'hidden' : 'block'}`}>
                   {action.config.emoji}
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-white font-medium text-sm truncate">
-                  {action.name} ACTIVATED!
+                <div className="text-white text-xs font-medium truncate">
+                  {action.name}
                 </div>
                 <div className="text-green-200 text-xs truncate">
-                  {action.bitsReceived} bits from {action.triggeredBy}
+                  {action.bitsReceived} from {action.triggeredBy}
                 </div>
-              </div>
-              <div className="bg-yellow-500/30 border border-yellow-400/50 rounded px-2 py-1 text-yellow-300 text-xs font-bold">
-                ✨ {action.bitsReceived}
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Regular Actions List */}
-      <div className="flex flex-col gap-3 max-w-xs">
+      {/* Minimal Actions List */}
+      <div className="flex flex-col gap-2 max-w-[200px]">
         {actions.map((action) => {
           const isTriggered = triggeredActions.some(ta => ta.id === action.id);
           const timer = actionTimers[action.id];
           const isActive = timer?.isActive || false;
           const remainingSeconds = timer?.remainingSeconds || 0;
-          const triggeredBy = timer?.triggeredBy || "";
 
           // Format remaining time as MM:SS
           const formatTime = (seconds: number): string => {
@@ -472,23 +460,24 @@ export default function OverlayPage(): React.ReactElement {
               key={action.id}
               className={`${
                 isActive
-                  ? "bg-red-800/40 border-red-500/50"
+                  ? "bg-red-900/60 border-red-500/60"
                   : isTriggered
-                    ? "bg-green-800/40 border-green-500/50"
-                    : "bg-gray-800/90 border-gray-700/50"
-              } backdrop-blur-sm rounded-lg p-3 border shadow-lg transition-all duration-500 relative overflow-hidden`}
+                    ? "bg-green-900/60 border-green-500/60"
+                    : "bg-black/40 border-white/10"
+              } backdrop-blur-sm rounded-md border transition-all duration-300 relative overflow-hidden`}
             >
               {/* Timer Background */}
               {isActive && (
-                <div className="absolute inset-0 bg-red-500/20 animate-pulse" />
+                <div className="absolute inset-0 bg-red-500/10 animate-pulse" />
               )}
 
-              <div className="relative flex items-center gap-3">
+              <div className="relative flex items-center gap-2 p-2">
+                {/* Minimal Icon */}
                 <div className={`${
-                  isActive ? "bg-red-700/50" : isTriggered ? "bg-green-700/50" : "bg-gray-700/50"
-                } rounded-lg min-w-[64px] h-16 overflow-hidden flex items-center justify-center transition-all duration-500`}>
+                  isActive ? "bg-red-600/80" : isTriggered ? "bg-green-600/80" : "bg-gray-600/60"
+                } rounded w-8 h-8 overflow-hidden flex items-center justify-center transition-all duration-300`}>
                   {isActive ? (
-                    <div className="text-4xl">🚫</div>
+                    <div className="text-lg">🚫</div>
                   ) : action.config.albionItem ? (
                     <img 
                       src={action.config.albionItem.imageUrl}
@@ -503,51 +492,42 @@ export default function OverlayPage(): React.ReactElement {
                       }}
                     />
                   ) : null}
-                  <div className={`text-4xl ${isActive || !action.config.albionItem ? 'block' : 'hidden'}`}>
+                  <div className={`text-sm ${isActive || !action.config.albionItem ? 'block' : 'hidden'}`}>
                     {isActive ? '' : action.config.emoji}
                   </div>
                 </div>
+
+                {/* Minimal Text */}
                 <div className="flex-1 min-w-0">
-                  <div className="text-white font-medium text-sm truncate">
+                  <div className="text-white text-xs font-medium truncate">
                     {action.name}
-                    {isActive && (
-                      <span className="ml-2 text-red-300 text-xs font-bold">
-                        BLOCKED
-                      </span>
-                    )}
                   </div>
-                  <div className="text-gray-300 text-xs truncate">
-                    {isActive ? (
-                      <span className="text-red-300">
-                        Time left: {formatTime(remainingSeconds)} | by {triggeredBy}
-                      </span>
-                    ) : (
-                      <span>
-                        {action.description || "No description"} | Duration: {action.config.duration}min
-                      </span>
-                    )}
-                  </div>
-                  {/* Timer Bar */}
                   {isActive && (
-                    <div className="mt-1 w-full bg-gray-700/50 rounded-full h-1">
-                      <div
-                        className="bg-red-400 h-1 rounded-full transition-all duration-1000 ease-out animate-pulse"
-                        style={{
-                          width: `${Math.max(0, (remainingSeconds / (action.config.duration * 60)) * 100)}%`,
-                        }}
-                      />
+                    <div className="text-red-300 text-xs">
+                      {formatTime(remainingSeconds)}
                     </div>
                   )}
                 </div>
-                <div className={`${
-                  isActive
-                    ? "bg-red-500/30 border-red-400/50 text-red-300"
-                    : "bg-yellow-500/20 border-yellow-500/30 text-yellow-400"
-                } border rounded px-2 py-1 text-xs font-bold`}>
-                  {isActive ? formatTime(remainingSeconds) : `${action.config.bitCost} bits`}
-                </div>
+
+                {/* Minimal Bits */}
+                {!isActive && (
+                  <div className="text-yellow-400 text-xs font-bold">
+                    {action.config.bitCost}
+                  </div>
+                )}
               </div>
 
+              {/* Minimal Timer Bar */}
+              {isActive && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-700/50">
+                  <div
+                    className="bg-red-400 h-0.5 transition-all duration-1000 ease-out"
+                    style={{
+                      width: `${Math.max(0, (remainingSeconds / (action.config.duration * 60)) * 100)}%`,
+                    }}
+                  />
+                </div>
+              )}
             </div>
           );
         })}

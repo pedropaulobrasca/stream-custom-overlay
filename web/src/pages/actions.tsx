@@ -182,7 +182,7 @@ function ActionsPage() {
                   </TableCell>
                   <TableCell className="font-medium">{action.name}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {action.description || "No description"}
+                    {action.description || ""}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">
