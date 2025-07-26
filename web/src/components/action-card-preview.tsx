@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 interface AlbionItem {
   uniqueName: string;
   name: string;
+  quality: number;
   imageUrl: string;
 }
 

@@ -5,6 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ActionCardPreview } from "./action-card-preview";
 import { AlbionItemSelector } from "./albion/albion-item-selector";
 import { api } from "@/lib/api";
@@ -38,6 +45,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
   });
 
   const [selectedAlbionItem, setSelectedAlbionItem] = useState<AlbionItem | null>(null);
+  const [selectedQuality, setSelectedQuality] = useState<number>(0);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -64,7 +72,8 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
           albionItem: selectedAlbionItem ? {
             uniqueName: selectedAlbionItem.UniqueName,
             name: selectedAlbionItem.LocalizedNames["EN-US"],
-            imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png`,
+            quality: selectedQuality,
+            imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png${selectedQuality > 0 ? `?quality=${selectedQuality}` : ''}`,
           } : null,
         },
       };
@@ -83,6 +92,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
         type: "albion-resource-block",
       });
       setSelectedAlbionItem(null);
+      setSelectedQuality(0);
 
       onActionCreated?.();
     } catch (error: any) {
@@ -132,9 +142,36 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
 
             <AlbionItemSelector
               selectedItem={selectedAlbionItem}
-              onItemSelect={setSelectedAlbionItem}
+              onItemSelect={(item) => {
+                setSelectedAlbionItem(item);
+                setSelectedQuality(0); // Reset quality when changing item
+              }}
               placeholder="Select an Albion item for the overlay..."
             />
+
+            {selectedAlbionItem && (
+              <div className="space-y-2">
+                <Label htmlFor="item-quality">Item Quality</Label>
+                <Select
+                  value={selectedQuality.toString()}
+                  onValueChange={(value) => setSelectedQuality(parseInt(value))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select quality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Normal</SelectItem>
+                    <SelectItem value="1">Good (.1)</SelectItem>
+                    <SelectItem value="2">Outstanding (.2)</SelectItem>
+                    <SelectItem value="3">Excellent (.3)</SelectItem>
+                    <SelectItem value="4">Masterpiece (.4)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="text-xs text-muted-foreground">
+                  Higher quality items have enhanced enchantment effects
+                </div>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label>Fallback Emoji/Icon</Label>
@@ -228,7 +265,8 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   albionItem={selectedAlbionItem ? {
                     uniqueName: selectedAlbionItem.UniqueName,
                     name: selectedAlbionItem.LocalizedNames["EN-US"],
-                    imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png`,
+                    quality: selectedQuality,
+                    imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png${selectedQuality > 0 ? `?quality=${selectedQuality}` : ''}`,
                   } : undefined}
                 />
               </div>
@@ -241,6 +279,18 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   <span>Type:</span>
                   <Badge variant="outline" className="text-xs">Albion Resource Block</Badge>
                 </div>
+                {selectedAlbionItem && (
+                  <div className="flex justify-between">
+                    <span>Quality:</span>
+                    <Badge variant="outline" className="text-xs">
+                      {selectedQuality === 0 ? "Normal" : 
+                       selectedQuality === 1 ? "Good (.1)" :
+                       selectedQuality === 2 ? "Outstanding (.2)" :
+                       selectedQuality === 3 ? "Excellent (.3)" :
+                       selectedQuality === 4 ? "Masterpiece (.4)" : "Normal"}
+                    </Badge>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Duration:</span>
                   <span>{formData.duration} minutes</span>

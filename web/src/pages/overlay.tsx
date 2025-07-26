@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 interface AlbionItem {
   uniqueName: string;
   name: string;
+  quality: number;
   imageUrl: string;
 }
 
