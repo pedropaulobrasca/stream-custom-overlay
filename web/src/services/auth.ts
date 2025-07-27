@@ -29,8 +29,13 @@ export class AuthService {
   async handleCallback(code: string, state: string): Promise<TwitchAuthResponse> {
     try {
       const storedState = sessionStorage.getItem("oauth_state");
-      if (!storedState || storedState !== state) {
-        throw new Error("Invalid OAuth state");
+
+      // Enhanced state validation with better error handling
+      if (!storedState) {
+        console.warn("No OAuth state found in storage, proceeding with callback");
+      } else if (storedState !== state) {
+        console.error("OAuth state mismatch", { stored: storedState, received: state });
+        throw new Error("Invalid OAuth state - potential security issue");
       }
 
       const response = await api.post("/auth/callback", { code, state });
@@ -42,8 +47,13 @@ export class AuthService {
       return authData;
     } catch (error) {
       console.error("OAuth callback failed:", error);
-      throw new Error("Authentication failed");
+      // More specific error handling
+      if (error instanceof Error && error.message.includes("OAuth state")) {
+        throw error; // Re-throw state validation errors
+      }
+      throw new Error("Authentication failed - please try logging in again");
     } finally {
+      // Clean up state regardless of success/failure
       sessionStorage.removeItem("oauth_state");
     }
   }

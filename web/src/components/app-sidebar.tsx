@@ -3,9 +3,7 @@ import {
   LayoutDashboard,
   List,
   TestTube,
-  Shield,
-  Coins,
-  Users,
+  Layers,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -22,8 +20,8 @@ import {
 import { SparklesText } from "./magicui/sparkles-text";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Base navigation items that are always available
-const baseNavItems = [
+// Navigation items for stream overlay functionality
+const navItems = [
   {
     title: "Dashboard",
     url: "/dashboard",
@@ -35,28 +33,9 @@ const baseNavItems = [
     icon: List,
   },
   {
-    title: "Item Database",
-    url: "/items",
-    icon: Shield,
-  },
-  {
-    title: "Market Tracker",
-    url: "/market",
-    icon: Coins,
-  },
-  {
-    title: "Guild Tools",
-    url: "/guild",
-    icon: Users,
-  },
-];
-
-// Additional navigation items that require actions to exist
-const actionsRequiredNavItems = [
-  {
     title: "Stream Overlays",
     url: "/overlays",
-    icon: List,
+    icon: Layers,
   },
   {
     title: "Test Panel",
@@ -79,8 +58,7 @@ export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.Com
     avatar: "",
   };
 
-  // Always show all navigation items for Albion Online tools
-  const navItems = [...baseNavItems, ...actionsRequiredNavItems];
+  // Navigation items for stream overlay functionality are already defined above
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

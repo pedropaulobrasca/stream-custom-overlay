@@ -50,6 +50,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           window.location.href = "/dashboard";
         } catch (error) {
           console.error("OAuth callback error:", error);
+
+          // Handle different types of auth errors
+          if (error instanceof Error && error.message.includes("OAuth state")) {
+            console.error("Security error: OAuth state validation failed");
+            // Redirect to login with error indication
+            window.history.replaceState({}, document.title, "/login?error=security");
+          } else {
+            console.error("General authentication error");
+            // Redirect to login with general error indication
+            window.history.replaceState({}, document.title, "/login?error=auth");
+          }
+
           callbackProcessing.current = false;
           setIsLoading(false);
         }

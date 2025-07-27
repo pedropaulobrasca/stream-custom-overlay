@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -13,26 +12,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ActionCardPreview } from "./action-card-preview";
-import { AlbionItemSelector } from "./albion/albion-item-selector";
+import { AlbionItemSelector } from "./albion-item-selector";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { AlbionItem, getAlbionItemImageUrl } from "@/lib/albion-utils";
 
 interface CreateActionFormProps {
   onActionCreated?: () => void;
   onCancel?: () => void;
 }
 
-interface AlbionItem {
-  UniqueName: string;
-  LocalizedNames: {
-    "EN-US": string;
-  };
-  LocalizedDescriptions?: {
-    "EN-US": string;
-  };
-  Index: string;
-}
 
 export function CreateActionForm({ onActionCreated, onCancel }: CreateActionFormProps) {
   const [formData, setFormData] = useState({
@@ -41,7 +31,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
     emoji: "⚡",
     bitCost: 100,
     duration: 5,
-    type: "albion-resource-block",
+    type: "stream-action",
   });
 
   const [selectedAlbionItem, setSelectedAlbionItem] = useState<AlbionItem | null>(null);
@@ -68,12 +58,11 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
           emoji: formData.emoji,
           bitCost: formData.bitCost,
           duration: formData.duration,
-          game: "albion-online",
           albionItem: selectedAlbionItem ? {
             uniqueName: selectedAlbionItem.UniqueName,
             name: selectedAlbionItem.LocalizedNames["EN-US"],
             quality: selectedQuality,
-            imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png?quality=${selectedQuality}`,
+            imageUrl: getAlbionItemImageUrl(selectedAlbionItem.UniqueName, selectedQuality),
           } : null,
         },
       };
@@ -89,10 +78,10 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
         emoji: "⚡",
         bitCost: 100,
         duration: 5,
-        type: "albion-resource-block",
+        type: "stream-action",
       });
       setSelectedAlbionItem(null);
-      setSelectedQuality(0);
+      setSelectedQuality(1);
 
       onActionCreated?.();
     } catch (error: any) {
@@ -103,7 +92,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
     }
   };
 
-  const commonEmojis = ["⚡", "🪓", "⛏️", "⚒️", "🌾", "🦌", "🏹", "⚔️", "🛡️", "💎", "🔥", "❄️", "🌟", "💰"];
+  const commonEmojis = ["⚡", "🎮", "🎯", "🎪", "🎊", "🎁", "🔥", "❄️", "🌟", "💰", "🎵", "🎨", "🎭", "🎲"];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -112,7 +101,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
         <CardHeader>
           <CardTitle>Create New Action</CardTitle>
           <CardDescription>
-            Configure your action that will appear in the Albion Online overlay
+            Configure your action that will appear in the stream overlay
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -123,7 +112,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Block Wood Collection"
+                placeholder="Custom Stream Action"
                 maxLength={50}
               />
             </div>
@@ -134,30 +123,27 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Block wood collection for duration"
+                placeholder="Custom action for stream interaction"
                 maxLength={100}
                 rows={2}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="game">Game</Label>
-              <Select value="albion-online" disabled>
+              <Label htmlFor="type">Action Type</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, type: value }))}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select game" />
+                  <SelectValue placeholder="Select action type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="albion-online">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-orange-500 rounded"></div>
-                      Albion Online
-                    </div>
-                  </SelectItem>
+                  <SelectItem value="stream-action">Stream Action</SelectItem>
+                  <SelectItem value="visual-effect">Visual Effect</SelectItem>
+                  <SelectItem value="sound-effect">Sound Effect</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="text-xs text-muted-foreground">
-                Currently only Albion Online is supported
-              </div>
             </div>
 
             <AlbionItemSelector
@@ -188,7 +174,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   </SelectContent>
                 </Select>
                 <div className="text-xs text-muted-foreground">
-                  Higher quality items have enhanced enchantment effects
+                  Higher quality items have enhanced visual effects
                 </div>
               </div>
             )}
@@ -196,7 +182,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
             <div className="space-y-2">
               <Label>Fallback Emoji/Icon</Label>
               <div className="text-sm text-muted-foreground mb-2">
-                Will be used if no Albion item is selected
+                Used when no Albion item is selected
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <Input
@@ -286,7 +272,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                     uniqueName: selectedAlbionItem.UniqueName,
                     name: selectedAlbionItem.LocalizedNames["EN-US"],
                     quality: selectedQuality,
-                    imageUrl: `https://render.albiononline.com/v1/item/${selectedAlbionItem.UniqueName}.png?quality=${selectedQuality}`,
+                    imageUrl: getAlbionItemImageUrl(selectedAlbionItem.UniqueName, selectedQuality),
                   } : undefined}
                 />
               </div>
@@ -297,20 +283,8 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
               <div className="space-y-1">
                 <div className="flex justify-between">
                   <span>Type:</span>
-                  <Badge variant="outline" className="text-xs">Albion Resource Block</Badge>
+                  <span className="capitalize">{formData.type.replace("-", " ")}</span>
                 </div>
-                {selectedAlbionItem && (
-                  <div className="flex justify-between">
-                    <span>Quality:</span>
-                    <Badge variant="outline" className="text-xs">
-                      {selectedQuality === 1 ? "Normal" :
-                        selectedQuality === 2 ? "Good" :
-                          selectedQuality === 3 ? "Outstanding" :
-                            selectedQuality === 4 ? "Excellent" :
-                              selectedQuality === 5 ? "Masterpiece" : "Normal"}
-                    </Badge>
-                  </div>
-                )}
                 <div className="flex justify-between">
                   <span>Duration:</span>
                   <span>{formData.duration} minutes</span>

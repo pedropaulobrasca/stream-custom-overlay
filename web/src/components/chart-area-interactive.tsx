@@ -165,10 +165,10 @@ export function ChartAreaInteractive() {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Albion Online Progress</CardTitle>
+        <CardTitle>Stream Progress</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Silver earned and Fame gained over the last 3 months
+            Engagement and interactions over the last 3 months
           </span>
           <span className="@[540px]/card:hidden">Progress tracking</span>
         </CardDescription>

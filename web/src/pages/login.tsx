@@ -48,7 +48,7 @@ function LoginPage(): React.ReactElement {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Welcome Back</CardTitle>
             <CardDescription>
-              Sign in to access your Albion Online stream overlay dashboard and create amazing content for your audience.
+              Sign in to access your stream overlay dashboard and create amazing content for your audience.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

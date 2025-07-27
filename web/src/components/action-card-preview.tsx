@@ -10,13 +10,14 @@ interface ActionCardPreviewProps {
   name: string;
   emoji: string;
   bitCost: number;
+  description?: string;
   albionItem?: AlbionItem;
 }
 
 export function ActionCardPreview({ name, emoji, bitCost, albionItem }: ActionCardPreviewProps) {
   return (
     <div className="relative flex flex-col items-center">
-      {/* Main Item Image - matching overlay style */}
+      {/* Main Action Icon - matching overlay style */}
       <div className="ring-2 ring-white/20 bg-black/20 w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group hover:scale-110">
         {albionItem ? (
           <img

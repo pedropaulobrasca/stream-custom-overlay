@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getAlbionItemImageUrl } from "@/lib/albion-utils";
 
+
+
 interface AlbionItem {
   uniqueName: string;
   name: string;
   quality: number;
   imageUrl: string;
 }
-
 
 interface Action {
   id: string;
