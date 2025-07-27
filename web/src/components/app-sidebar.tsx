@@ -4,6 +4,7 @@ import {
   List,
   TestTube,
   Layers,
+  Wrench,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -20,27 +21,60 @@ import {
 import { SparklesText } from "./magicui/sparkles-text";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Navigation items for stream overlay functionality
-const navItems = [
+// Navigation groups organized by functionality
+const navigationGroups = [
+  // Dashboard - standalone at the top
   {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LayoutDashboard,
+    items: [
+      {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: LayoutDashboard,
+      },
+    ],
   },
+  // Overlay group - core streaming functionality
   {
-    title: "Stream Actions",
-    url: "/actions",
-    icon: List,
+    title: "Overlay",
+    items: [
+      {
+        title: "Stream Actions",
+        url: "/actions",
+        icon: List,
+      },
+      {
+        title: "Stream Overlays",
+        url: "/overlays",
+        icon: Layers,
+      },
+      {
+        title: "Test Panel",
+        url: "/test-panel",
+        icon: TestTube,
+      },
+    ],
   },
+  // Tools group - future Albion tools
   {
-    title: "Stream Overlays",
-    url: "/overlays",
-    icon: Layers,
-  },
-  {
-    title: "Test Panel",
-    url: "/test-panel",
-    icon: TestTube,
+    title: "Tools",
+    items: [
+      {
+        title: "Coming Soon",
+        url: "#",
+        icon: Wrench,
+      },
+      // Future Albion tools will be added here:
+      // {
+      //   title: "Market Tracker",
+      //   url: "/tools/market",
+      //   icon: TrendingUp,
+      // },
+      // {
+      //   title: "Guild Tools",
+      //   url: "/tools/guild",
+      //   icon: Users,
+      // },
+    ],
   },
 ];
 
@@ -58,7 +92,8 @@ export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.Com
     avatar: "",
   };
 
-  // Navigation items for stream overlay functionality are already defined above
+  // Show all navigation groups
+  const visibleGroups = navigationGroups;
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -79,7 +114,7 @@ export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.Com
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navItems} />
+        <NavMain groups={visibleGroups} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={userData} />
