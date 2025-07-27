@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getAlbionItemImageUrl, getQualityName, getQualityColor } from "@/lib/albion-utils";
+import { getAlbionItemImageUrl } from "@/lib/albion-utils";
 
 interface AlbionItem {
   uniqueName: string;
