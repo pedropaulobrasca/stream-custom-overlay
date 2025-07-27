@@ -32,7 +32,19 @@ function MarketPage() {
     
     try {
       const data = await albionDataApi.getMarketData(popularItems);
-      setMarketData(data);
+      console.log('Market data received:', data);
+      
+      // Additional check to ensure unique data
+      const uniqueData = data.filter((item, index, self) => 
+        index === self.findIndex(t => 
+          t.itemId === item.itemId && 
+          t.city === item.city && 
+          t.quality === item.quality
+        )
+      );
+      
+      console.log('Unique market data:', uniqueData);
+      setMarketData(uniqueData);
       setLastRefresh(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch market data');
@@ -234,8 +246,8 @@ function MarketPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                sortedData.map((item) => (
-                  <TableRow key={`${item.itemId}-${item.city}`}>
+                sortedData.map((item, index) => (
+                  <TableRow key={`${item.itemId}-${item.city}-${item.quality}-${index}`}>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded ${getQualityBgColor(item.quality)}`} />

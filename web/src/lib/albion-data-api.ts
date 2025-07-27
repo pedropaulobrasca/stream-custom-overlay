@@ -200,7 +200,8 @@ class AlbionDataApiClient {
     try {
       const priceData = await this.getCurrentPrices(items, locations);
 
-      return priceData.map((item): AlbionMarketPrice => ({
+      // Convert to market data and filter out duplicates
+      const marketData = priceData.map((item): AlbionMarketPrice => ({
         itemId: item.item_id,
         itemName: this.getItemDisplayName(item.item_id),
         city: item.city,
@@ -210,6 +211,17 @@ class AlbionDataApiClient {
         lastUpdate: this.formatTimestamp(item.sell_price_min_date || item.buy_price_max_date),
         trend: this.calculateTrend(item),
       }));
+
+      // Remove duplicates based on itemId + city + quality combination
+      const uniqueData = marketData.filter((item, index, self) => 
+        index === self.findIndex(t => 
+          t.itemId === item.itemId && 
+          t.city === item.city && 
+          t.quality === item.quality
+        )
+      );
+
+      return uniqueData;
     } catch (error) {
       console.error("Failed to fetch market data:", error);
       return [];
