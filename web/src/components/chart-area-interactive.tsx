@@ -31,110 +31,110 @@ import {
 export const description = "An interactive area chart";
 
 const chartData = [
-  { date: "2024-04-01", desktop: 222, mobile: 150 },
-  { date: "2024-04-02", desktop: 97, mobile: 180 },
-  { date: "2024-04-03", desktop: 167, mobile: 120 },
-  { date: "2024-04-04", desktop: 242, mobile: 260 },
-  { date: "2024-04-05", desktop: 373, mobile: 290 },
-  { date: "2024-04-06", desktop: 301, mobile: 340 },
-  { date: "2024-04-07", desktop: 245, mobile: 180 },
-  { date: "2024-04-08", desktop: 409, mobile: 320 },
-  { date: "2024-04-09", desktop: 59, mobile: 110 },
-  { date: "2024-04-10", desktop: 261, mobile: 190 },
-  { date: "2024-04-11", desktop: 327, mobile: 350 },
-  { date: "2024-04-12", desktop: 292, mobile: 210 },
-  { date: "2024-04-13", desktop: 342, mobile: 380 },
-  { date: "2024-04-14", desktop: 137, mobile: 220 },
-  { date: "2024-04-15", desktop: 120, mobile: 170 },
-  { date: "2024-04-16", desktop: 138, mobile: 190 },
-  { date: "2024-04-17", desktop: 446, mobile: 360 },
-  { date: "2024-04-18", desktop: 364, mobile: 410 },
-  { date: "2024-04-19", desktop: 243, mobile: 180 },
-  { date: "2024-04-20", desktop: 89, mobile: 150 },
-  { date: "2024-04-21", desktop: 137, mobile: 200 },
-  { date: "2024-04-22", desktop: 224, mobile: 170 },
-  { date: "2024-04-23", desktop: 138, mobile: 230 },
-  { date: "2024-04-24", desktop: 387, mobile: 290 },
-  { date: "2024-04-25", desktop: 215, mobile: 250 },
-  { date: "2024-04-26", desktop: 75, mobile: 130 },
-  { date: "2024-04-27", desktop: 383, mobile: 420 },
-  { date: "2024-04-28", desktop: 122, mobile: 180 },
-  { date: "2024-04-29", desktop: 315, mobile: 240 },
-  { date: "2024-04-30", desktop: 454, mobile: 380 },
-  { date: "2024-05-01", desktop: 165, mobile: 220 },
-  { date: "2024-05-02", desktop: 293, mobile: 310 },
-  { date: "2024-05-03", desktop: 247, mobile: 190 },
-  { date: "2024-05-04", desktop: 385, mobile: 420 },
-  { date: "2024-05-05", desktop: 481, mobile: 390 },
-  { date: "2024-05-06", desktop: 498, mobile: 520 },
-  { date: "2024-05-07", desktop: 388, mobile: 300 },
-  { date: "2024-05-08", desktop: 149, mobile: 210 },
-  { date: "2024-05-09", desktop: 227, mobile: 180 },
-  { date: "2024-05-10", desktop: 293, mobile: 330 },
-  { date: "2024-05-11", desktop: 335, mobile: 270 },
-  { date: "2024-05-12", desktop: 197, mobile: 240 },
-  { date: "2024-05-13", desktop: 197, mobile: 160 },
-  { date: "2024-05-14", desktop: 448, mobile: 490 },
-  { date: "2024-05-15", desktop: 473, mobile: 380 },
-  { date: "2024-05-16", desktop: 338, mobile: 400 },
-  { date: "2024-05-17", desktop: 499, mobile: 420 },
-  { date: "2024-05-18", desktop: 315, mobile: 350 },
-  { date: "2024-05-19", desktop: 235, mobile: 180 },
-  { date: "2024-05-20", desktop: 177, mobile: 230 },
-  { date: "2024-05-21", desktop: 82, mobile: 140 },
-  { date: "2024-05-22", desktop: 81, mobile: 120 },
-  { date: "2024-05-23", desktop: 252, mobile: 290 },
-  { date: "2024-05-24", desktop: 294, mobile: 220 },
-  { date: "2024-05-25", desktop: 201, mobile: 250 },
-  { date: "2024-05-26", desktop: 213, mobile: 170 },
-  { date: "2024-05-27", desktop: 420, mobile: 460 },
-  { date: "2024-05-28", desktop: 233, mobile: 190 },
-  { date: "2024-05-29", desktop: 78, mobile: 130 },
-  { date: "2024-05-30", desktop: 340, mobile: 280 },
-  { date: "2024-05-31", desktop: 178, mobile: 230 },
-  { date: "2024-06-01", desktop: 178, mobile: 200 },
-  { date: "2024-06-02", desktop: 470, mobile: 410 },
-  { date: "2024-06-03", desktop: 103, mobile: 160 },
-  { date: "2024-06-04", desktop: 439, mobile: 380 },
-  { date: "2024-06-05", desktop: 88, mobile: 140 },
-  { date: "2024-06-06", desktop: 294, mobile: 250 },
-  { date: "2024-06-07", desktop: 323, mobile: 370 },
-  { date: "2024-06-08", desktop: 385, mobile: 320 },
-  { date: "2024-06-09", desktop: 438, mobile: 480 },
-  { date: "2024-06-10", desktop: 155, mobile: 200 },
-  { date: "2024-06-11", desktop: 92, mobile: 150 },
-  { date: "2024-06-12", desktop: 492, mobile: 420 },
-  { date: "2024-06-13", desktop: 81, mobile: 130 },
-  { date: "2024-06-14", desktop: 426, mobile: 380 },
-  { date: "2024-06-15", desktop: 307, mobile: 350 },
-  { date: "2024-06-16", desktop: 371, mobile: 310 },
-  { date: "2024-06-17", desktop: 475, mobile: 520 },
-  { date: "2024-06-18", desktop: 107, mobile: 170 },
-  { date: "2024-06-19", desktop: 341, mobile: 290 },
-  { date: "2024-06-20", desktop: 408, mobile: 450 },
-  { date: "2024-06-21", desktop: 169, mobile: 210 },
-  { date: "2024-06-22", desktop: 317, mobile: 270 },
-  { date: "2024-06-23", desktop: 480, mobile: 530 },
-  { date: "2024-06-24", desktop: 132, mobile: 180 },
-  { date: "2024-06-25", desktop: 141, mobile: 190 },
-  { date: "2024-06-26", desktop: 434, mobile: 380 },
-  { date: "2024-06-27", desktop: 448, mobile: 490 },
-  { date: "2024-06-28", desktop: 149, mobile: 200 },
-  { date: "2024-06-29", desktop: 103, mobile: 160 },
-  { date: "2024-06-30", desktop: 446, mobile: 400 },
+  { date: "2024-04-01", silver: 2220000, fame: 150000 },
+  { date: "2024-04-02", silver: 970000, fame: 180000 },
+  { date: "2024-04-03", silver: 1670000, fame: 120000 },
+  { date: "2024-04-04", silver: 2420000, fame: 260000 },
+  { date: "2024-04-05", silver: 3730000, fame: 290000 },
+  { date: "2024-04-06", silver: 3010000, fame: 340000 },
+  { date: "2024-04-07", silver: 2450000, fame: 180000 },
+  { date: "2024-04-08", silver: 4090000, fame: 320000 },
+  { date: "2024-04-09", silver: 590000, fame: 110000 },
+  { date: "2024-04-10", silver: 2610000, fame: 190000 },
+  { date: "2024-04-11", silver: 3270000, fame: 350000 },
+  { date: "2024-04-12", silver: 2920000, fame: 210000 },
+  { date: "2024-04-13", silver: 3420000, fame: 380000 },
+  { date: "2024-04-14", silver: 1370000, fame: 220000 },
+  { date: "2024-04-15", silver: 1200000, fame: 170000 },
+  { date: "2024-04-16", silver: 1380000, fame: 190000 },
+  { date: "2024-04-17", silver: 4460000, fame: 360000 },
+  { date: "2024-04-18", silver: 3640000, fame: 410000 },
+  { date: "2024-04-19", silver: 2430000, fame: 180000 },
+  { date: "2024-04-20", silver: 890000, fame: 150000 },
+  { date: "2024-04-21", silver: 1370000, fame: 200000 },
+  { date: "2024-04-22", silver: 2240000, fame: 170000 },
+  { date: "2024-04-23", silver: 1380000, fame: 230000 },
+  { date: "2024-04-24", silver: 3870000, fame: 290000 },
+  { date: "2024-04-25", silver: 2150000, fame: 250000 },
+  { date: "2024-04-26", silver: 750000, fame: 130000 },
+  { date: "2024-04-27", silver: 3830000, fame: 420000 },
+  { date: "2024-04-28", silver: 1220000, fame: 180000 },
+  { date: "2024-04-29", silver: 3150000, fame: 240000 },
+  { date: "2024-04-30", silver: 4540000, fame: 380000 },
+  { date: "2024-05-01", silver: 1650000, fame: 220000 },
+  { date: "2024-05-02", silver: 2930000, fame: 310000 },
+  { date: "2024-05-03", silver: 2470000, fame: 190000 },
+  { date: "2024-05-04", silver: 3850000, fame: 420000 },
+  { date: "2024-05-05", silver: 4810000, fame: 390000 },
+  { date: "2024-05-06", silver: 4980000, fame: 520000 },
+  { date: "2024-05-07", silver: 3880000, fame: 300000 },
+  { date: "2024-05-08", silver: 1490000, fame: 210000 },
+  { date: "2024-05-09", silver: 2270000, fame: 180000 },
+  { date: "2024-05-10", silver: 2930000, fame: 330000 },
+  { date: "2024-05-11", silver: 3350000, fame: 270000 },
+  { date: "2024-05-12", silver: 1970000, fame: 240000 },
+  { date: "2024-05-13", silver: 1970000, fame: 160000 },
+  { date: "2024-05-14", silver: 4480000, fame: 490000 },
+  { date: "2024-05-15", silver: 4730000, fame: 380000 },
+  { date: "2024-05-16", silver: 3380000, fame: 400000 },
+  { date: "2024-05-17", silver: 4990000, fame: 420000 },
+  { date: "2024-05-18", silver: 3150000, fame: 350000 },
+  { date: "2024-05-19", silver: 2350000, fame: 180000 },
+  { date: "2024-05-20", silver: 1770000, fame: 230000 },
+  { date: "2024-05-21", silver: 820000, fame: 140000 },
+  { date: "2024-05-22", silver: 810000, fame: 120000 },
+  { date: "2024-05-23", silver: 2520000, fame: 290000 },
+  { date: "2024-05-24", silver: 2940000, fame: 220000 },
+  { date: "2024-05-25", silver: 2010000, fame: 250000 },
+  { date: "2024-05-26", silver: 2130000, fame: 170000 },
+  { date: "2024-05-27", silver: 4200000, fame: 460000 },
+  { date: "2024-05-28", silver: 2330000, fame: 190000 },
+  { date: "2024-05-29", silver: 780000, fame: 130000 },
+  { date: "2024-05-30", silver: 3400000, fame: 280000 },
+  { date: "2024-05-31", silver: 1780000, fame: 230000 },
+  { date: "2024-06-01", silver: 1780000, fame: 200000 },
+  { date: "2024-06-02", silver: 4700000, fame: 410000 },
+  { date: "2024-06-03", silver: 1030000, fame: 160000 },
+  { date: "2024-06-04", silver: 4390000, fame: 380000 },
+  { date: "2024-06-05", silver: 880000, fame: 140000 },
+  { date: "2024-06-06", silver: 2940000, fame: 250000 },
+  { date: "2024-06-07", silver: 3230000, fame: 370000 },
+  { date: "2024-06-08", silver: 3850000, fame: 320000 },
+  { date: "2024-06-09", silver: 4380000, fame: 480000 },
+  { date: "2024-06-10", silver: 1550000, fame: 200000 },
+  { date: "2024-06-11", silver: 920000, fame: 150000 },
+  { date: "2024-06-12", silver: 4920000, fame: 420000 },
+  { date: "2024-06-13", silver: 810000, fame: 130000 },
+  { date: "2024-06-14", silver: 4260000, fame: 380000 },
+  { date: "2024-06-15", silver: 3070000, fame: 350000 },
+  { date: "2024-06-16", silver: 3710000, fame: 310000 },
+  { date: "2024-06-17", silver: 4750000, fame: 520000 },
+  { date: "2024-06-18", silver: 1070000, fame: 170000 },
+  { date: "2024-06-19", silver: 3410000, fame: 290000 },
+  { date: "2024-06-20", silver: 4080000, fame: 450000 },
+  { date: "2024-06-21", silver: 1690000, fame: 210000 },
+  { date: "2024-06-22", silver: 3170000, fame: 270000 },
+  { date: "2024-06-23", silver: 4800000, fame: 530000 },
+  { date: "2024-06-24", silver: 1320000, fame: 180000 },
+  { date: "2024-06-25", silver: 1410000, fame: 190000 },
+  { date: "2024-06-26", silver: 4340000, fame: 380000 },
+  { date: "2024-06-27", silver: 4480000, fame: 490000 },
+  { date: "2024-06-28", silver: 1490000, fame: 200000 },
+  { date: "2024-06-29", silver: 1030000, fame: 160000 },
+  { date: "2024-06-30", silver: 4460000, fame: 400000 },
 ];
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  progress: {
+    label: "Progress",
   },
-  desktop: {
-    label: "Desktop",
-    color: "var(--primary)",
+  silver: {
+    label: "Silver Earned",
+    color: "hsl(45, 93%, 47%)",
   },
-  mobile: {
-    label: "Mobile",
-    color: "var(--primary)",
+  fame: {
+    label: "Fame Gained",
+    color: "hsl(221, 83%, 53%)",
   },
 } satisfies ChartConfig;
 
@@ -165,12 +165,12 @@ export function ChartAreaInteractive() {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Total Visitors</CardTitle>
+        <CardTitle>Albion Online Progress</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Total for the last 3 months
+            Silver earned and Fame gained over the last 3 months
           </span>
-          <span className="@[540px]/card:hidden">Last 3 months</span>
+          <span className="@[540px]/card:hidden">Progress tracking</span>
         </CardDescription>
         <CardAction>
           <ToggleGroup
@@ -213,27 +213,27 @@ export function ChartAreaInteractive() {
         >
           <AreaChart data={filteredData}>
             <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillSilver" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="var(--color-silver)"
                   stopOpacity={1.0}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="var(--color-silver)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillFame" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--color-fame)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--color-fame)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -269,17 +269,17 @@ export function ChartAreaInteractive() {
               }
             />
             <Area
-              dataKey="mobile"
+              dataKey="fame"
               type="natural"
-              fill="url(#fillMobile)"
-              stroke="var(--color-mobile)"
+              fill="url(#fillFame)"
+              stroke="var(--color-fame)"
               stackId="a"
             />
             <Area
-              dataKey="desktop"
+              dataKey="silver"
               type="natural"
-              fill="url(#fillDesktop)"
-              stroke="var(--color-desktop)"
+              fill="url(#fillSilver)"
+              stroke="var(--color-silver)"
               stackId="a"
             />
           </AreaChart>

@@ -410,19 +410,19 @@ export default function OverlayPage(): React.ReactElement {
             >
               <div className="w-8 h-8 rounded-lg overflow-hidden bg-green-700 flex items-center justify-center">
                 {action.config.albionItem ? (
-                  <img 
+                  <img
                     src={action.config.albionItem.imageUrl}
                     alt={action.config.albionItem.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = 'none';
+                      target.style.display = "none";
                       const sibling = target.nextElementSibling as HTMLElement;
-                      if (sibling) sibling.style.display = 'block';
+                      if (sibling) sibling.style.display = "block";
                     }}
                   />
                 ) : null}
-                <div className={`text-sm ${action.config.albionItem ? 'hidden' : 'block'}`}>
+                <div className={`text-sm ${action.config.albionItem ? "hidden" : "block"}`}>
                   {action.config.emoji}
                 </div>
               </div>
@@ -461,23 +461,23 @@ export default function OverlayPage(): React.ReactElement {
             >
               {/* Main Item Image */}
               <div className={`${
-                isActive ? "ring-4 ring-red-400 bg-red-800" : 
-                isTriggered ? "ring-4 ring-green-400 bg-green-800" : "ring-2 ring-white/20 bg-black/20"
+                isActive ? "ring-4 ring-red-400 bg-red-800" :
+                  isTriggered ? "ring-4 ring-green-400 bg-green-800" : "ring-2 ring-white/20 bg-black/20"
               } w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group hover:scale-110`}>
                 {action.config.albionItem ? (
-                  <img 
+                  <img
                     src={action.config.albionItem.imageUrl}
                     alt={action.config.albionItem.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = 'none';
+                      target.style.display = "none";
                       const sibling = target.nextElementSibling as HTMLElement;
-                      if (sibling) sibling.style.display = 'flex';
+                      if (sibling) sibling.style.display = "flex";
                     }}
                   />
                 ) : null}
-                <div className={`w-full h-full flex items-center justify-center text-xl ${!action.config.albionItem ? 'flex' : 'hidden'}`}>
+                <div className={`w-full h-full flex items-center justify-center text-xl ${!action.config.albionItem ? "flex" : "hidden"}`}>
                   {action.config.emoji}
                 </div>
 

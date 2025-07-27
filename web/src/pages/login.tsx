@@ -24,7 +24,7 @@ function LoginPage(): React.ReactElement {
     // TODO: Implement email/password login
     console.log("Form login:", values);
     // For now, show a message that this is not implemented
-    alert("Email/password login not yet implemented. Please use Twitch login.");
+    console.warn("Email/password login not yet implemented. Please use Twitch login.");
   };
 
   return (

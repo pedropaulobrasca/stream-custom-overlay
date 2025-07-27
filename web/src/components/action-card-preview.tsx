@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 
 interface AlbionItem {
   uniqueName: string;
@@ -21,19 +20,19 @@ export function ActionCardPreview({ name, description, emoji, bitCost, albionIte
       {/* Main Item Image - matching overlay style */}
       <div className="ring-2 ring-white/20 bg-black/20 w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group hover:scale-110">
         {albionItem ? (
-          <img 
+          <img
             src={albionItem.imageUrl}
             alt={albionItem.name}
             className="w-full h-full object-cover"
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
-              target.style.display = 'none';
+              target.style.display = "none";
               const sibling = target.nextElementSibling as HTMLElement;
-              if (sibling) sibling.style.display = 'flex';
+              if (sibling) sibling.style.display = "flex";
             }}
           />
         ) : null}
-        <div className={`w-full h-full flex items-center justify-center text-xl ${!albionItem ? 'flex' : 'hidden'}`}>
+        <div className={`w-full h-full flex items-center justify-center text-xl ${!albionItem ? "flex" : "hidden"}`}>
           {emoji || "⚡"}
         </div>
       </div>

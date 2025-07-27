@@ -163,20 +163,20 @@ function ActionsPage() {
                   <TableCell>
                     <div className="flex items-center justify-center h-12 w-12 rounded bg-muted overflow-hidden">
                       {action.config?.albionItem ? (
-                        <img 
+                        <img
                           src={action.config.albionItem.imageUrl}
                           alt={action.config.albionItem.name}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             // Fallback to emoji if image fails to load
                             const target = e.currentTarget as HTMLImageElement;
-                            target.style.display = 'none';
+                            target.style.display = "none";
                             const sibling = target.nextElementSibling as HTMLElement;
-                            if (sibling) sibling.style.display = 'flex';
+                            if (sibling) sibling.style.display = "flex";
                           }}
                         />
                       ) : null}
-                      <div className={`text-lg flex items-center justify-center w-full h-full ${action.config?.albionItem ? 'hidden' : 'flex'}`}>
+                      <div className={`text-lg flex items-center justify-center w-full h-full ${action.config?.albionItem ? "hidden" : "flex"}`}>
                         {action.config?.emoji || "⚡"}
                       </div>
                     </div>

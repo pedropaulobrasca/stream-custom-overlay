@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,14 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, Package } from "lucide-react";
@@ -42,10 +34,10 @@ interface AlbionItemSelectorProps {
   placeholder?: string;
 }
 
-export function AlbionItemSelector({ 
-  selectedItem, 
-  onItemSelect, 
-  placeholder = "Select an Albion item..." 
+export function AlbionItemSelector({
+  selectedItem,
+  onItemSelect,
+  placeholder = "Select an Albion item...",
 }: AlbionItemSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,15 +50,15 @@ export function AlbionItemSelector({
   // Parse and filter items
   const items = useMemo(() => {
     return (albionItems as AlbionItem[])
-      .filter(item => 
-        item.LocalizedNames?.["EN-US"] && 
+      .filter(item =>
+        item.LocalizedNames?.["EN-US"] &&
         item.UniqueName &&
         // Filter out quest items and hideouts that are not useful for streaming
         !item.UniqueName.includes("UNIQUE_HIDEOUT") &&
         !item.UniqueName.includes("QUESTITEM") &&
         !item.UniqueName.includes("PREMIUM") &&
         // Keep most items - remove the overly restrictive filter
-        item.UniqueName.length > 0
+        item.UniqueName.length > 0,
       )
       .slice(0, 3000); // Increased limit for better coverage
   }, []);
@@ -76,35 +68,35 @@ export function AlbionItemSelector({
     if (!searchTerm) return items.slice(0, 100); // Show first 100 when no search
 
     const lowerSearch = searchTerm.toLowerCase();
-    const searchWords = lowerSearch.split(' ').filter(word => word.length > 0);
-    
+    const searchWords = lowerSearch.split(" ").filter(word => word.length > 0);
+
     return items
       .filter(item => {
-        const itemName = item.LocalizedNames["EN-US"]?.toLowerCase() || '';
+        const itemName = item.LocalizedNames["EN-US"]?.toLowerCase() || "";
         const uniqueName = item.UniqueName.toLowerCase();
-        
+
         // Check if all search words are found in either the name or unique name
-        return searchWords.every(word => 
-          itemName.includes(word) || uniqueName.includes(word)
+        return searchWords.every(word =>
+          itemName.includes(word) || uniqueName.includes(word),
         );
       })
       .sort((a, b) => {
         // Sort by relevance - exact matches first, then partial matches
-        const aName = a.LocalizedNames["EN-US"]?.toLowerCase() || '';
-        const bName = b.LocalizedNames["EN-US"]?.toLowerCase() || '';
-        
+        const aName = a.LocalizedNames["EN-US"]?.toLowerCase() || "";
+        const bName = b.LocalizedNames["EN-US"]?.toLowerCase() || "";
+
         const aExactMatch = aName === lowerSearch;
         const bExactMatch = bName === lowerSearch;
-        
+
         if (aExactMatch && !bExactMatch) return -1;
         if (!aExactMatch && bExactMatch) return 1;
-        
+
         const aStartsWith = aName.startsWith(lowerSearch);
         const bStartsWith = bName.startsWith(lowerSearch);
-        
+
         if (aStartsWith && !bStartsWith) return -1;
         if (!aStartsWith && bStartsWith) return 1;
-        
+
         return aName.localeCompare(bName);
       })
       .slice(0, 200); // Increased limit for search results
@@ -116,7 +108,7 @@ export function AlbionItemSelector({
     return match ? `T${match[1]}` : "";
   };
 
-  // Get quality from item name  
+  // Get quality from item name
   const getItemQuality = (uniqueName: string) => {
     const match = uniqueName.match(/@(\d)/);
     return match ? `@${match[1]}` : "";
@@ -137,13 +129,13 @@ export function AlbionItemSelector({
       <Label>Albion Item</Label>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="w-full h-auto p-3 justify-start text-left"
           >
             {selectedItem ? (
               <div className="flex items-center space-x-3 w-full">
-                <img 
+                <img
                   src={getItemImageUrl(selectedItem.UniqueName)}
                   alt={selectedItem.LocalizedNames["EN-US"]}
                   className="w-8 h-8 object-contain"
@@ -185,7 +177,7 @@ export function AlbionItemSelector({
               Choose an item that will be displayed in your stream overlay
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -201,8 +193,8 @@ export function AlbionItemSelector({
               <div className="p-2">
                 {selectedItem && (
                   <div className="mb-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={handleClear}
                       className="w-full text-muted-foreground"
                     >
@@ -210,7 +202,7 @@ export function AlbionItemSelector({
                     </Button>
                   </div>
                 )}
-                
+
                 <div className="space-y-1">
                   {filteredItems.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
@@ -230,7 +222,7 @@ export function AlbionItemSelector({
                         className="w-full h-auto p-3 justify-start hover:bg-accent"
                       >
                         <div className="flex items-center space-x-3 w-full">
-                          <img 
+                          <img
                             src={getItemImageUrl(item.UniqueName)}
                             alt={item.LocalizedNames["EN-US"]}
                             className="w-10 h-10 object-contain flex-shrink-0"

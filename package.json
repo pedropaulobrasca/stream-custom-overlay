@@ -1,7 +1,7 @@
 {
-  "name": "stream-custom-overlay",
+  "name": "overaction-albion-tools",
   "version": "1.0.0",
-  "description": "Stream custom overlay monorepo",
+  "description": "Overaction - Complete Albion Online streaming and gaming tools platform",
   "private": true,
   "workspaces": [
     "api",

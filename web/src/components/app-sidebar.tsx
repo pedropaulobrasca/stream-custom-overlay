@@ -3,6 +3,9 @@ import {
   LayoutDashboard,
   List,
   TestTube,
+  Shield,
+  Coins,
+  Users,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -18,7 +21,6 @@ import {
 } from "@/components/ui/sidebar";
 import { SparklesText } from "./magicui/sparkles-text";
 import { useAuth } from "@/contexts/AuthContext";
-import { useActions } from "@/hooks/useActions";
 
 // Base navigation items that are always available
 const baseNavItems = [
@@ -28,16 +30,31 @@ const baseNavItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Actions",
+    title: "Stream Actions",
     url: "/actions",
     icon: List,
+  },
+  {
+    title: "Item Database",
+    url: "/items",
+    icon: Shield,
+  },
+  {
+    title: "Market Tracker",
+    url: "/market",
+    icon: Coins,
+  },
+  {
+    title: "Guild Tools",
+    url: "/guild",
+    icon: Users,
   },
 ];
 
 // Additional navigation items that require actions to exist
 const actionsRequiredNavItems = [
   {
-    title: "Overlays",
+    title: "Stream Overlays",
     url: "/overlays",
     icon: List,
   },
@@ -50,7 +67,6 @@ const actionsRequiredNavItems = [
 
 export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
-  const { hasActions } = useActions();
 
   // Create user data for NavUser component
   const userData = user ? {
@@ -63,8 +79,8 @@ export const AppSidebar = React.memo(function AppSidebar({ ...props }: React.Com
     avatar: "",
   };
 
-  // Build navigation items based on whether user has actions
-  const navItems = hasActions ? [...baseNavItems, ...actionsRequiredNavItems] : baseNavItems;
+  // Always show all navigation items for Albion Online tools
+  const navItems = [...baseNavItems, ...actionsRequiredNavItems];
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

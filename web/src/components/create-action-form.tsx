@@ -303,11 +303,11 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   <div className="flex justify-between">
                     <span>Quality:</span>
                     <Badge variant="outline" className="text-xs">
-                      {selectedQuality === 1 ? "Normal" : 
-                       selectedQuality === 2 ? "Good" :
-                       selectedQuality === 3 ? "Outstanding" :
-                       selectedQuality === 4 ? "Excellent" :
-                       selectedQuality === 5 ? "Masterpiece" : "Normal"}
+                      {selectedQuality === 1 ? "Normal" :
+                        selectedQuality === 2 ? "Good" :
+                          selectedQuality === 3 ? "Outstanding" :
+                            selectedQuality === 4 ? "Excellent" :
+                              selectedQuality === 5 ? "Masterpiece" : "Normal"}
                     </Badge>
                   </div>
                 )}

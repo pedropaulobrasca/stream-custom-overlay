@@ -1,7 +1,7 @@
 {
-  "name": "@stream-custom-overlay/api",
+  "name": "@overaction-albion-tools/api",
   "version": "1.0.0",
-  "description": "API backend for stream custom overlay",
+  "description": "Overaction API - Backend for Albion Online streaming and gaming tools",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

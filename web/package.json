@@ -1,7 +1,7 @@
 {
-  "name": "@stream-custom-overlay/web",
+  "name": "@overaction-albion-tools/web",
   "version": "1.0.0",
-  "description": "Frontend React app for stream custom overlay",
+  "description": "Overaction web app - Complete Albion Online streaming and gaming tools",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,15 +1,29 @@
-# Stream Custom Overlay
+# Overaction - Albion Online Tools Platform
 
-A comprehensive streaming overlay system with real-time Twitch integration, user authentication, and database-backed data management.
+The ultimate platform for Albion Online players and streamers, featuring comprehensive tools for gaming optimization, stream overlays, real-time Twitch integration, and advanced Albion Online data management.
 
 ## 🚀 Features
 
+### For Albion Online Players
+- **Item Database & Search** - Complete Albion Online item database with advanced filtering
+- **Build Calculator** - Plan and optimize your character builds
+- **Market Analysis** - Real-time market data and price tracking
+- **Guild Management Tools** - Track guild activities and member progression
+- **PvP Statistics** - Analyze your combat performance and improvement areas
+
+### For Albion Online Streamers
+- **Dynamic Stream Overlays** - Real-time Albion Online game integration
+- **Twitch Bit Actions** - Viewers can trigger in-game events with bits
+- **Live Stats Display** - Show current character stats, inventory, and progress
+- **Interactive Elements** - Audience engagement through Albion-themed actions
+- **Professional UI** - Modern, game-themed design with shadcn/ui components
+
+### Platform Features
 - **Twitch OAuth Authentication** - Secure login with Twitch integration
-- **Real-time Overlays** - Dynamic overlays for games like Albion Online
-- **Action Management** - Custom actions triggered by stream events
-- **User Dashboard** - Complete management interface
-- **Database Integration** - PostgreSQL with Drizzle ORM
-- **Professional UI** - Modern design with shadcn/ui components
+- **Real-time Data** - Live Albion Online game data integration
+- **User Dashboard** - Complete management interface for all tools
+- **Database Integration** - PostgreSQL with Drizzle ORM for performance
+- **Cross-Platform Support** - Works with OBS, Streamlabs, and other streaming software
 
 ## 🏗 Architecture
 
@@ -51,7 +65,7 @@ npm install
 ### 2. Configure Twitch Application
 1. Go to [Twitch Developers Console](https://dev.twitch.tv/console)
 2. Create a new application:
-   - **Name**: Stream Custom Overlay
+   - **Name**: Overaction - Albion Online Tools
    - **OAuth Redirect URL**: `http://localhost:3000/auth/callback`
    - **Category**: Website Integration
 3. Copy the Client ID and Client Secret
@@ -141,12 +155,16 @@ npm run preview --workspace=web  # Preview production build
 ## 🗄 Database Structure
 
 ### Core Tables
-- **`users`** - Twitch user profiles and metadata
+- **`users`** - Twitch user profiles and Albion Online character data
 - **`user_sessions`** - Active JWT sessions
 - **`twitch_integrations`** - OAuth tokens and scopes
-- **`actions`** - User-defined stream actions
-- **`overlays`** - Custom overlay configurations
+- **`actions`** - Albion Online themed stream actions
+- **`overlays`** - Custom Albion Online overlay configurations
 - **`events`** - System events and analytics
+- **`albion_characters`** - Linked Albion Online character profiles
+- **`albion_items`** - Complete Albion Online item database
+- **`albion_builds`** - User-created character builds
+- **`market_data`** - Real-time Albion Online market information
 
 ### Key Features
 - **UUID Primary Keys** with CUID2 generation
@@ -200,6 +218,23 @@ Ensure all production environment variables are set:
 - Twitch integration follows OAuth 2.0 best practices
 - Database credentials should never be committed
 
+## 🎮 Albion Online Integration
+
+### Supported Features
+- **Character Stats Tracking** - Monitor fame, silver, and progression
+- **Inventory Management** - Track valuable items and gear sets
+- **Guild Activity** - Monitor guild events and member activities
+- **Market Integration** - Real-time price data for trading decisions
+- **PvP Analytics** - Detailed combat statistics and kill/death tracking
+- **Build Optimization** - Theory-craft and share optimal builds
+
+### Streaming Enhancements
+- **Live Overlay Updates** - Real-time game state reflected in stream overlay
+- **Viewer Interactions** - Twitch bits trigger Albion-themed animations
+- **Character Showcase** - Display current gear, stats, and achievements
+- **Market Alerts** - Show profitable trading opportunities to viewers
+- **PvP Highlights** - Automatic highlights of combat achievements
+
 ---
 
-**Built with ❤️ for the streaming community**
+**Built with ❤️ for the Albion Online community**
