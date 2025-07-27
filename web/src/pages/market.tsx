@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { getQualityBgColor, formatSilver, calculateProfitMargin, getMarketCities } from "@/lib/albion-utils";
 
 interface MarketData {
   itemId: string;
@@ -65,15 +66,7 @@ const mockMarketData: MarketData[] = [
   },
 ];
 
-const cities = ["All Cities", "Caerleon", "Bridgewatch", "Lymhurst", "Thetford", "Fort Sterling", "Martlock"];
-
-const qualityColors = {
-  1: "bg-gray-500",
-  2: "bg-green-500",
-  3: "bg-blue-500",
-  4: "bg-purple-500",
-  5: "bg-orange-500",
-};
+const cities = ["All Cities", ...getMarketCities()];
 
 function MarketPage() {
   const [selectedCity, setSelectedCity] = useState("All Cities");
@@ -107,9 +100,6 @@ function MarketPage() {
     }
   };
 
-  const calculateProfitMargin = (sellPrice: number, buyPrice: number) => {
-    return ((sellPrice - buyPrice) / buyPrice * 100).toFixed(1);
-  };
 
   return (
     <div className="flex flex-1 flex-col p-6">
@@ -222,7 +212,7 @@ function MarketPage() {
                 <TableRow key={`${item.itemId}-${item.city}`}>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded ${qualityColors[item.quality as keyof typeof qualityColors]}`} />
+                      <div className={`w-3 h-3 rounded ${getQualityBgColor(item.quality)}`} />
                       <span className="font-medium">{item.itemName}</span>
                     </div>
                   </TableCell>
@@ -233,18 +223,18 @@ function MarketPage() {
                     </div>
                   </TableCell>
                   <TableCell className="font-mono">
-                    {item.buyPrice.toLocaleString()}
+                    {formatSilver(item.buyPrice)}
                   </TableCell>
                   <TableCell className="font-mono font-semibold">
-                    {item.sellPrice.toLocaleString()}
+                    {formatSilver(item.sellPrice)}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-semibold text-green-600">
-                        +{(item.sellPrice - item.buyPrice).toLocaleString()}
+                        +{formatSilver(item.sellPrice - item.buyPrice)}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {calculateProfitMargin(item.sellPrice, item.buyPrice)}%
+                        {calculateProfitMargin(item.sellPrice, item.buyPrice).toFixed(1)}%
                       </span>
                     </div>
                   </TableCell>

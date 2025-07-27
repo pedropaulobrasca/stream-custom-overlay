@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { getAlbionItemImageUrl, getQualityName, getQualityColor } from "@/lib/albion-utils";
 
 interface AlbionItem {
   uniqueName: string;
@@ -7,6 +8,7 @@ interface AlbionItem {
   quality: number;
   imageUrl: string;
 }
+
 
 interface Action {
   id: string;
@@ -411,7 +413,7 @@ export default function OverlayPage(): React.ReactElement {
               <div className="w-8 h-8 rounded-lg overflow-hidden bg-green-700 flex items-center justify-center">
                 {action.config.albionItem ? (
                   <img
-                    src={action.config.albionItem.imageUrl}
+                    src={getAlbionItemImageUrl(action.config.albionItem.uniqueName, action.config.albionItem.quality)}
                     alt={action.config.albionItem.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -466,7 +468,7 @@ export default function OverlayPage(): React.ReactElement {
               } w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group hover:scale-110`}>
                 {action.config.albionItem ? (
                   <img
-                    src={action.config.albionItem.imageUrl}
+                    src={getAlbionItemImageUrl(action.config.albionItem.uniqueName, action.config.albionItem.quality)}
                     alt={action.config.albionItem.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {

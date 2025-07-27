@@ -8,13 +8,12 @@ interface AlbionItem {
 
 interface ActionCardPreviewProps {
   name: string;
-  description: string;
   emoji: string;
   bitCost: number;
   albionItem?: AlbionItem;
 }
 
-export function ActionCardPreview({ name, description, emoji, bitCost, albionItem }: ActionCardPreviewProps) {
+export function ActionCardPreview({ name, emoji, bitCost, albionItem }: ActionCardPreviewProps) {
   return (
     <div className="relative flex flex-col items-center">
       {/* Main Item Image - matching overlay style */}

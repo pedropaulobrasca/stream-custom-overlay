@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getQualityBgColor, formatSilver } from "@/lib/albion-utils";
 
 interface AlbionItem {
   id: string;
@@ -73,13 +74,6 @@ const categoryIcons = {
   mount: Shirt,
 };
 
-const qualityColors = {
-  1: "bg-gray-500",
-  2: "bg-green-500",
-  3: "bg-blue-500",
-  4: "bg-purple-500",
-  5: "bg-orange-500",
-};
 
 function ItemsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -156,7 +150,7 @@ function ItemsPage() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded ${qualityColors[item.quality as keyof typeof qualityColors]}`} />
+                    <div className={`w-3 h-3 rounded ${getQualityBgColor(item.quality)}`} />
                     <Badge variant="outline">T{item.tier}{item.enchantment > 0 ? `.${item.enchantment}` : ""}</Badge>
                   </div>
                   <CategoryIcon className="w-4 h-4 text-muted-foreground" />
@@ -171,7 +165,7 @@ function ItemsPage() {
                   </div>
                   <div className="flex items-center gap-1 font-semibold">
                     <div className="w-4 h-4 bg-yellow-500 rounded-full" />
-                    {item.marketValue.toLocaleString()}
+                    {formatSilver(item.marketValue, true)}
                   </div>
                 </div>
               </CardContent>

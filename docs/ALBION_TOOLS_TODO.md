@@ -2,10 +2,10 @@
 
 ## 🎯 Phase 1: Core Foundation (Current Focus)
 - [x] Create TODO documentation
-- [ ] **Implement Albion item selection in action creation**
-- [ ] **Update overlay to display Albion item renders instead of icons**
+- [x] **Implement Albion item selection in action creation**
+- [x] **Update overlay to display Albion item renders instead of icons**
 - [ ] Set up Albion Online API integration
-- [ ] Create shared Albion utilities and types
+- [x] Create shared Albion utilities and types
 
 ## 🏆 Phase 2: Market Price Tracker
 - [ ] Real-time price fetching from Albion Data API
@@ -81,13 +81,14 @@
 ---
 
 ## 📋 Current Sprint Goals
-1. **Immediate**: Implement Albion item selection in action creation
-2. **Next**: Update overlay to show item renders instead of generic icons
-3. **Following**: Set up basic API integration for market data
+1. ✅ **COMPLETED**: Implement Albion item selection in action creation
+2. ✅ **COMPLETED**: Update overlay to show item renders instead of generic icons  
+3. **Next**: Set up basic API integration for market data
 
 ## 🎯 Success Metrics
-- [ ] Streamers can select Albion items when creating actions
-- [ ] Overlays display actual item images from Albion renders
+- [x] Streamers can select Albion items when creating actions
+- [x] Overlays display actual item images from Albion renders
+- [x] Shared Albion utilities and type system created
 - [ ] Real-time market data integration working
 - [ ] 5+ core tools implemented and functional
 - [ ] Positive feedback from Albion streaming community
