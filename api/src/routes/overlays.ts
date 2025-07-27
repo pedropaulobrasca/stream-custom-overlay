@@ -1,5 +1,5 @@
 import express from "express";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, and } from "drizzle-orm";
 import { db } from "../database/connection";
 import { overlays, actions, NewOverlay } from "../database/schema";
 import { authenticateToken } from "../middleware/auth";
@@ -11,6 +11,32 @@ const router = express.Router();
 router.get("/public/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Handle special "default" overlay case
+    if (id === "default") {
+      // Extract userId from query or path - for default overlay, we need to get it from the frontend
+      // Since this is called from /overlay/:userId/default, we can parse the referrer or use a different approach
+      // For now, let's create a virtual default overlay response
+      const defaultOverlay = {
+        id: "default",
+        userId: "auto", // Will be handled by frontend
+        name: "Default Stream Overlay",
+        description: "Auto-generated overlay for stream actions",
+        game: "stream",
+        config: {
+          theme: "default",
+          position: { x: 100, y: 100 },
+          size: { width: 400, height: 300 },
+          actions: [], // Will be populated by actions endpoint
+        },
+        isActive: true,
+        viewCount: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      return res.json(defaultOverlay);
+    }
 
     const overlay = await db
       .select()
@@ -33,6 +59,21 @@ router.get("/public/:id", async (req, res) => {
 router.get("/public/:id/actions", async (req, res) => {
   try {
     const { id } = req.params;
+    const { userId } = req.query; // Get userId from query parameter
+
+    // Handle special "default" overlay case
+    if (id === "default" && userId) {
+      // Get all active actions for this user
+      const userActions = await db
+        .select()
+        .from(actions)
+        .where(and(
+          eq(actions.userId, userId as string),
+          eq(actions.isActive, true)
+        ));
+
+      return res.json(userActions);
+    }
 
     // Get overlay first
     const overlay = await db
@@ -46,12 +87,15 @@ router.get("/public/:id/actions", async (req, res) => {
     }
 
     // Get actions from overlay config
-    if (overlay[0].config && overlay[0].config.actions && overlay[0].config.actions.length > 0) {
+    const config = overlay[0].config as any;
+    if (config && config.actions && config.actions.length > 0) {
       const overlayActions = await db
         .select()
         .from(actions)
-        .where(inArray(actions.id, overlay[0].config.actions))
-        .where(eq(actions.isActive, true));
+        .where(and(
+          inArray(actions.id, config.actions),
+          eq(actions.isActive, true)
+        ));
 
       res.json(overlayActions);
     } else {

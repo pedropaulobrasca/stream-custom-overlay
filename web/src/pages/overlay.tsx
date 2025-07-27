@@ -71,7 +71,12 @@ export default function OverlayPage(): React.ReactElement {
 
         if (overlay) {
           // Get actions for this overlay using the public route
-          const actionsResponse = await fetch(`/api/overlays/public/${overlayId}/actions`);
+          // For default overlay, pass userId as query parameter
+          const actionsUrl = overlayId === "default" 
+            ? `/api/overlays/public/${overlayId}/actions?userId=${userId}`
+            : `/api/overlays/public/${overlayId}/actions`;
+          
+          const actionsResponse = await fetch(actionsUrl);
           if (!actionsResponse.ok) {
             throw new Error("Failed to fetch overlay actions");
           }

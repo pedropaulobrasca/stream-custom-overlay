@@ -79,7 +79,7 @@ router.post("/callback", async (req, res) => {
       twitchId: user.twitchId,
       username: user.username,
       displayName: user.displayName,
-      profileImage: user.profileImage,
+      profileImage: user.profileImage || "",
     };
 
     // Generate JWT

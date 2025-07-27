@@ -1,5 +1,5 @@
 import express from "express";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../database/connection";
 import { actions, overlays, NewAction, NewOverlay } from "../database/schema";
 import { authenticateToken } from "../middleware/auth";
@@ -77,8 +77,10 @@ router.post("/", async (req: AuthenticatedRequest, res) => {
       const existingOverlay = await tx
         .select()
         .from(overlays)
-        .where(eq(overlays.userId, userId))
-        .where(eq(overlays.game, "albion-online"))
+        .where(and(
+          eq(overlays.userId, userId),
+          eq(overlays.game, "albion-online")
+        ))
         .limit(1);
 
       let overlay;

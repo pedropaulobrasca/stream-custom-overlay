@@ -12,11 +12,13 @@ import { Badge } from "@/components/ui/badge";
 import { Copy, Edit, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useOverlays } from "@/hooks/useOverlays";
+import { useActions } from "@/hooks/useActions";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function OverlaysPage(): React.ReactElement {
   const { user } = useAuth();
   const { overlays, loading, error } = useOverlays();
+  const { actions } = useActions();
 
   const copyToClipboard = (overlayId: string): void => {
     const url = `${window.location.origin}/overlay/${user?.userId}/${overlayId}`;
@@ -71,12 +73,70 @@ export default function OverlaysPage(): React.ReactElement {
         </Button>
       </div>
 
-      {overlays.length === 0 ? (
+      {overlays.length === 0 && actions.length === 0 ? (
         <div className="border rounded-lg p-8 text-center">
           <p className="text-muted-foreground mb-4">No overlays available yet.</p>
           <p className="text-sm text-muted-foreground">
             Create your first stream action to automatically generate your overlay.
           </p>
+        </div>
+      ) : overlays.length === 0 && actions.length > 0 ? (
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Game</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>URL</TableHead>
+                <TableHead>Actions</TableHead>
+                <TableHead className="text-right">Tools</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                    Stream
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="default">Active</Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <code className="text-sm bg-muted px-2 py-1 rounded truncate max-w-xs">
+                      {`${window.location.origin}/overlay/${user?.userId}/default`}
+                    </code>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => copyToClipboard('default')}
+                      className="h-8 w-8"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => window.open(`${window.location.origin}/overlay/${user?.userId}/default`, '_blank')}
+                      className="h-8 w-8"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+                <TableCell>{actions.length} actions</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      Auto-generated
+                    </Badge>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
       ) : (
         <div className="border rounded-lg">
