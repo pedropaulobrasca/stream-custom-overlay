@@ -5,6 +5,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import { createServer } from "http";
 import eventsRouter from "./routes/events";
 import sseRouter from "./routes/sse";
 import authRouter from "./routes/auth";
@@ -13,6 +14,7 @@ import webhooksRouter from "./routes/webhooks";
 import actionsRouter from "./routes/actions";
 import overlaysRouter from "./routes/overlays";
 import { testDatabaseConnection } from "./database/connection";
+import { desktopWS } from "./services/desktop-ws";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -54,12 +56,38 @@ app.use("/api/actions", actionsRouter);
 // Overlays API
 app.use("/api/overlays", overlaysRouter);
 
-app.listen(PORT, async () => {
+// Create HTTP server
+const server = createServer(app);
+
+// Initialize WebSocket service for desktop app
+desktopWS.initialize(server);
+
+server.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Desktop WebSocket available at ws://localhost:${PORT}/streamer-events`);
 
   // Test database connection on startup
   const dbConnected = await testDatabaseConnection();
   if (!dbConnected) {
     console.warn("⚠️  Server started but database connection failed. Some features may not work.");
   }
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  desktopWS.close();
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  desktopWS.close();
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });

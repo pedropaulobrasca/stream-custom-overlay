@@ -1,0 +1,53 @@
+{
+  "name": "overaction-desktop",
+  "version": "1.0.0",
+  "description": "Overaction Desktop App - Streamer punishment controls",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "concurrently \"npm run build:watch\" \"npm run electron:dev\"",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "electron:dev": "wait-on dist/main.js && electron .",
+    "electron:pack": "electron-builder",
+    "electron:pack:win": "electron-builder --win",
+    "preelectron:pack": "npm run build"
+  },
+  "keywords": ["electron", "albion", "streaming", "overlay"],
+  "author": "Overaction",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/ws": "^8.5.10",
+    "concurrently": "^8.2.2",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "typescript": "^5.3.0",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  },
+  "build": {
+    "appId": "com.overaction.desktop",
+    "productName": "Overaction Desktop",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  }
+}

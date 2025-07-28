@@ -32,6 +32,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
     bitCost: 100,
     duration: 5,
     type: "stream-action",
+    skillKey: "e", // For disable_skill actions
   });
 
   const [selectedAlbionItem, setSelectedAlbionItem] = useState<AlbionItem | null>(null);
@@ -58,6 +59,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
           emoji: formData.emoji,
           bitCost: formData.bitCost,
           duration: formData.duration,
+          skillKey: formData.skillKey, // Include skill key for disable_skill actions
           albionItem: selectedAlbionItem ? {
             uniqueName: selectedAlbionItem.UniqueName,
             name: selectedAlbionItem.LocalizedNames["EN-US"],
@@ -79,6 +81,7 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
         bitCost: 100,
         duration: 5,
         type: "stream-action",
+        skillKey: "e",
       });
       setSelectedAlbionItem(null);
       setSelectedQuality(1);
@@ -139,12 +142,39 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   <SelectValue placeholder="Select action type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="stream-action">Stream Action</SelectItem>
-                  <SelectItem value="visual-effect">Visual Effect</SelectItem>
-                  <SelectItem value="sound-effect">Sound Effect</SelectItem>
+                  <SelectItem value="disable_skill">🚫 Block Skill Key (E/Q/W/R)</SelectItem>
+                  <SelectItem value="disable_movement">🚶 Block Movement (W)</SelectItem>
+                  <SelectItem value="disable_interaction">🤏 Block Interaction (F)</SelectItem>
+                  <SelectItem value="stream-action">⚡ General Stream Action</SelectItem>
+                  <SelectItem value="visual-effect">🎨 Visual Effect</SelectItem>
+                  <SelectItem value="sound-effect">🔊 Sound Effect</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Skill Key Selection for disable_skill type */}
+            {formData.type === 'disable_skill' && (
+              <div className="space-y-2">
+                <Label htmlFor="skillKey">Skill Key to Block</Label>
+                <Select
+                  value={formData.skillKey}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, skillKey: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select skill key" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="q">Q - First Skill</SelectItem>
+                    <SelectItem value="w">W - Second Skill</SelectItem>
+                    <SelectItem value="e">E - Third Skill</SelectItem>
+                    <SelectItem value="r">R - Ultimate Skill</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="text-xs text-muted-foreground">
+                  Choose which skill key will be blocked when this action is executed
+                </div>
+              </div>
+            )}
 
             <AlbionItemSelector
               selectedItem={selectedAlbionItem}
@@ -224,15 +254,24 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="duration">Duration (minutes)</Label>
+                <Label htmlFor="duration">
+                  {['disable_skill', 'disable_movement', 'disable_interaction'].includes(formData.type) 
+                    ? 'Duration (seconds)' 
+                    : 'Duration (minutes)'}
+                </Label>
                 <Input
                   id="duration"
                   type="number"
                   min="1"
-                  max="60"
+                  max={['disable_skill', 'disable_movement', 'disable_interaction'].includes(formData.type) ? "30" : "60"}
                   value={formData.duration}
                   onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) || 0 }))}
                 />
+                {['disable_skill', 'disable_movement', 'disable_interaction'].includes(formData.type) && (
+                  <div className="text-xs text-muted-foreground">
+                    How long the key will be blocked (1-30 seconds)
+                  </div>
+                )}
               </div>
             </div>
 
@@ -287,8 +326,30 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                 </div>
                 <div className="flex justify-between">
                   <span>Duration:</span>
-                  <span>{formData.duration} minutes</span>
+                  <span>
+                    {formData.duration} {['disable_skill', 'disable_movement', 'disable_interaction'].includes(formData.type) ? 'seconds' : 'minutes'}
+                  </span>
                 </div>
+                {formData.type === 'disable_skill' && (
+                  <div className="flex justify-between">
+                    <span>Blocks Key:</span>
+                    <span className="uppercase font-mono bg-muted px-2 py-1 rounded text-xs">
+                      {formData.skillKey}
+                    </span>
+                  </div>
+                )}
+                {formData.type === 'disable_movement' && (
+                  <div className="flex justify-between">
+                    <span>Blocks Key:</span>
+                    <span className="uppercase font-mono bg-muted px-2 py-1 rounded text-xs">W</span>
+                  </div>
+                )}
+                {formData.type === 'disable_interaction' && (
+                  <div className="flex justify-between">
+                    <span>Blocks Key:</span>
+                    <span className="uppercase font-mono bg-muted px-2 py-1 rounded text-xs">F</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Cost:</span>
                   <span>{formData.bitCost} bits</span>

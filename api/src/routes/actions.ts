@@ -4,6 +4,7 @@ import { db } from "../database/connection";
 import { actions, NewAction } from "../database/schema";
 import { authenticateToken } from "../middleware/auth";
 import { AuthenticatedRequest } from "../types/auth";
+import { desktopWS } from "../services/desktop-ws";
 
 const router = express.Router();
 
@@ -172,6 +173,87 @@ router.delete("/:id", async (req: AuthenticatedRequest, res) => {
   } catch (error) {
     console.error("Error deleting action:", error);
     res.status(500).json({ error: "Failed to delete action" });
+  }
+});
+
+// Execute action (send punishment to desktop app)
+router.post("/:id/execute", async (req: AuthenticatedRequest, res) => {
+  try {
+    const { id } = req.params;
+    const { triggeredBy } = req.body;
+
+    // Check if action exists and belongs to user
+    const existingAction = await db
+      .select()
+      .from(actions)
+      .where(eq(actions.id, id))
+      .limit(1);
+
+    if (!existingAction[0] || existingAction[0].userId !== req.user!.userId) {
+      return res.status(404).json({ error: "Action not found" });
+    }
+
+    if (!existingAction[0].isActive) {
+      return res.status(400).json({ error: "Action is not active" });
+    }
+
+    // Extract punishment details from action config
+    const config = existingAction[0].config as any;
+    
+    // Generate punishment based on action type
+    let punishmentType = '';
+    let duration = 5000; // default 5 seconds
+
+    switch (existingAction[0].type) {
+      case 'disable_skill':
+        // Map skill keys to punishment types
+        const skillKey = config.skillKey || 'e';
+        punishmentType = `block_key_${skillKey.toLowerCase()}`;
+        duration = (config.duration || 5) * 1000;
+        break;
+      
+      case 'disable_movement':
+        punishmentType = 'block_key_w';
+        duration = (config.duration || 3) * 1000;
+        break;
+      
+      case 'disable_interaction':
+        punishmentType = 'block_key_f';
+        duration = (config.duration || 2) * 1000;
+        break;
+      
+      default:
+        return res.status(400).json({ error: "Unsupported action type for desktop execution" });
+    }
+
+    // Create punishment object
+    const punishment = {
+      id: `punishment_${Date.now()}_${Math.random().toString(36).substring(2)}`,
+      type: punishmentType,
+      duration: duration,
+      triggeredBy: triggeredBy || 'manual'
+    };
+
+    // Send punishment to desktop clients
+    desktopWS.sendPunishment(punishment);
+
+    // Schedule punishment end notification
+    setTimeout(() => {
+      desktopWS.sendPunishmentEnd(punishment.id);
+    }, duration);
+
+    console.log(`Executed action ${existingAction[0].name} - Punishment:`, punishment);
+
+    res.json({
+      success: true,
+      punishment,
+      action: existingAction[0],
+      desktopClientsNotified: desktopWS.getAuthenticatedClientsCount()
+    });
+
+  } catch (error) {
+    console.error("Error executing action:", error);
+    res.status(500).json({ error: "Failed to execute action" });
   }
 });
 
