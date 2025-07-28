@@ -100,3 +100,7 @@ Commit messages should be humanized and avoid AI detection patterns. Follow conv
 - Keep the entire project consistently in English
   - All code, comments, documentation, and communication should be in English
   - Maintain language uniformity across all project files and components
+
+## Claude Memories
+
+- PARA DE CRIAR SCRIPT PRA TUDO!!! SO QUANDO EU PEDIR

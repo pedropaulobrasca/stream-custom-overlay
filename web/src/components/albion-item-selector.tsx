@@ -62,7 +62,7 @@ export function AlbionItemSelector({
                 <div className="flex items-center gap-2">
                   <img
                     src={getAlbionItemImageUrl(selectedItem.UniqueName, 1)}
-                    alt={selectedItem.LocalizedNames["EN-US"]}
+                    alt={selectedItem.LocalizedNames?.["EN-US"] || selectedItem.UniqueName}
                     className="w-5 h-5 object-cover rounded"
                     onError={(e) => {
                       const target = e.currentTarget as HTMLImageElement;
@@ -70,7 +70,7 @@ export function AlbionItemSelector({
                     }}
                   />
                   <span className="truncate">
-                    {selectedItem.LocalizedNames["EN-US"]}
+                    {selectedItem.LocalizedNames?.["EN-US"] || selectedItem.UniqueName}
                   </span>
                 </div>
               ) : (
@@ -104,7 +104,7 @@ export function AlbionItemSelector({
                   >
                     <img
                       src={getAlbionItemImageUrl(item.UniqueName, 1)}
-                      alt={item.LocalizedNames["EN-US"]}
+                      alt={item.LocalizedNames?.["EN-US"] || item.UniqueName}
                       className="w-8 h-8 object-cover rounded flex-shrink-0"
                       onError={(e) => {
                         const target = e.currentTarget as HTMLImageElement;
@@ -113,7 +113,7 @@ export function AlbionItemSelector({
                     />
                     <div className="flex-1 text-left">
                       <div className="text-sm font-medium truncate">
-                        {item.LocalizedNames["EN-US"]}
+                        {item.LocalizedNames?.["EN-US"] || item.UniqueName}
                       </div>
                       <div className="text-xs text-muted-foreground truncate">
                         {item.UniqueName}

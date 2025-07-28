@@ -1,7 +1,7 @@
 import express from "express";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "../database/connection";
-import { actions, overlays, NewAction, NewOverlay } from "../database/schema";
+import { actions, NewAction } from "../database/schema";
 import { authenticateToken } from "../middleware/auth";
 import { AuthenticatedRequest } from "../types/auth";
 
@@ -59,70 +59,19 @@ router.post("/", async (req: AuthenticatedRequest, res) => {
 
     const userId = req.user!.userId;
 
-    // Start transaction to create action and overlay together
-    const result = await db.transaction(async (tx) => {
-      // Create the action
-      const newAction: NewAction = {
-        userId,
-        name,
-        description,
-        type,
-        config,
-        isActive: true,
-      };
+    // Create the action directly (no auto overlay creation)
+    const newAction: NewAction = {
+      userId,
+      name,
+      description,
+      type,
+      config,
+      isActive: true,
+    };
 
-      const createdAction = await tx.insert(actions).values(newAction).returning();
+    const createdAction = await db.insert(actions).values(newAction).returning();
 
-      // Check if Albion overlay already exists for this user
-      const existingOverlay = await tx
-        .select()
-        .from(overlays)
-        .where(and(
-          eq(overlays.userId, userId),
-          eq(overlays.game, "albion-online")
-        ))
-        .limit(1);
-
-      let overlay;
-      if (existingOverlay.length === 0) {
-        // Create Albion overlay if it doesn't exist
-        const newOverlay: NewOverlay = {
-          userId,
-          name: "Albion Online Overlay",
-          description: "Overlay for Albion Online actions",
-          game: "albion-online",
-          config: {
-            theme: "default",
-            position: { x: 100, y: 100 },
-            size: { width: 400, height: 300 },
-            actions: [createdAction[0].id],
-          },
-          isActive: true,
-        };
-
-        overlay = await tx.insert(overlays).values(newOverlay).returning();
-      } else {
-        // Update existing overlay to include new action
-        const currentConfig = existingOverlay[0].config as Record<string, any>;
-        const updatedConfig = {
-          ...currentConfig,
-          actions: [...(currentConfig.actions || []), createdAction[0].id],
-        };
-
-        overlay = await tx
-          .update(overlays)
-          .set({
-            config: updatedConfig,
-            updatedAt: new Date(),
-          })
-          .where(eq(overlays.id, existingOverlay[0].id))
-          .returning();
-      }
-
-      return { action: createdAction[0], overlay: overlay[0] };
-    });
-
-    res.status(201).json(result);
+    res.status(201).json(createdAction[0]);
   } catch (error) {
     console.error("Error creating action:", error);
     res.status(500).json({ error: "Failed to create action" });

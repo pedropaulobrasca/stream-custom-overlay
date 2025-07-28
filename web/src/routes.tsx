@@ -9,6 +9,7 @@ import ActionsPage from "./pages/actions";
 import OverlaysPage from "./pages/overlays";
 import OverlayPage from "./pages/overlay";
 import TestPanelPage from "./pages/test-panel";
+import ItemPrice from "./pages/item-price";
 
 export function AppRoutes() {
   return (
@@ -25,6 +26,7 @@ export function AppRoutes() {
         <Route path="actions" element={<ActionsPage />} />
         <Route path="overlays" element={<OverlaysPage />} />
         <Route path="test-panel" element={<TestPanelPage />} />
+        <Route path="item-price" element={<ItemPrice />} />
       </Route>
       <Route path="/overlay/:userId/:overlayId" element={<OverlayPage />} />
     </Routes>

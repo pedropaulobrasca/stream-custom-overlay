@@ -4,7 +4,7 @@ import {
   List,
   TestTube,
   Layers,
-  Wrench,
+  DollarSign,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -59,21 +59,10 @@ const navigationGroups = [
     title: "Tools",
     items: [
       {
-        title: "Coming Soon",
-        url: "#",
-        icon: Wrench,
-      },
-      // Future Albion tools will be added here:
-      // {
-      //   title: "Market Tracker",
-      //   url: "/tools/market",
-      //   icon: TrendingUp,
-      // },
-      // {
-      //   title: "Guild Tools",
-      //   url: "/tools/guild",
-      //   icon: Users,
-      // },
+        title: "Item Pricce",
+        url: "/item-price",
+        icon: DollarSign,
+      }
     ],
   },
 ];
