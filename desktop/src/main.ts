@@ -175,21 +175,18 @@ class OveractionDesktop {
   }
 
   private handlePunishment(punishment: any) {
-    switch (punishment.type) {
-      case 'block_key_e':
-        this.keyboardController.blockKey('e', punishment.duration);
-        break;
-      case 'block_key_q':
-        this.keyboardController.blockKey('q', punishment.duration);
-        break;
-      case 'block_key_w':
-        this.keyboardController.blockKey('w', punishment.duration);
-        break;
-      case 'block_key_r':
-        this.keyboardController.blockKey('r', punishment.duration);
-        break;
-      default:
-        console.log('Unknown punishment type:', punishment.type);
+    // Handle blocking actions
+    if (punishment.type.startsWith('block_key_')) {
+      const key = punishment.type.replace('block_key_', '');
+      this.keyboardController.blockKey(key, punishment.duration);
+    }
+    // Handle key press actions
+    else if (punishment.type.startsWith('press_key_')) {
+      const key = punishment.type.replace('press_key_', '');
+      this.keyboardController.pressKey(key);
+    }
+    else {
+      console.log('Unknown punishment type:', punishment.type);
     }
 
     // Notify the UI

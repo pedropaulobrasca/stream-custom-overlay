@@ -60,14 +60,16 @@ export default function OverlayPage(): React.ReactElement {
 
   // Execute keyboard action when clicked
   const executeKeyboardAction = async (action: Action) => {
-    // Only execute if it's a keyboard blocking action and not currently active
-    if (!['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type)) {
+    // Only execute if it's a keyboard action and not currently active (for blocking actions)
+    if (!['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(action.type)) {
       return;
     }
 
     const timer = actionTimers[action.id];
-    if (timer?.isActive) {
-      return; // Action already active
+    // For blocking actions, don't execute if already active
+    // For press_key actions, allow execution even if on cooldown
+    if (timer?.isActive && ['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type)) {
+      return; // Blocking action already active
     }
 
     try {
@@ -200,7 +202,7 @@ export default function OverlayPage(): React.ReactElement {
           if (action && updated[actionId]) {
             const activatedAt = new Date(event.timestamp);
             // Use seconds for keyboard actions, minutes for others
-            const durationMs = ['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type) 
+            const durationMs = ['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(action.type) 
               ? action.config.duration * 1000 
               : action.config.duration * 60 * 1000;
             const endsAt = new Date(activatedAt.getTime() + durationMs);
@@ -497,8 +499,9 @@ export default function OverlayPage(): React.ReactElement {
           const timer = actionTimers[action.id];
           const isActive = timer?.isActive || false;
           const remainingSeconds = timer?.remainingSeconds || 0;
-          const isKeyboardAction = ['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type);
-          const canExecute = isKeyboardAction && !isActive;
+          const isKeyboardAction = ['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(action.type);
+          const isBlockingAction = ['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type);
+          const canExecute = isKeyboardAction && (!isActive || !isBlockingAction);
 
           // Format remaining time as MM:SS
           const formatTime = (seconds: number): string => {
@@ -577,7 +580,7 @@ export default function OverlayPage(): React.ReactElement {
                   <div
                     className="h-full bg-red-400 transition-all duration-1000 ease-out"
                     style={{
-                      width: `${Math.max(0, (remainingSeconds / (isKeyboardAction ? action.config.duration : action.config.duration * 60)) * 100)}%`,
+                      width: `${Math.max(0, (remainingSeconds / (isBlockingAction ? action.config.duration : action.config.duration * 60)) * 100)}%`,
                     }}
                   />
                 </div>

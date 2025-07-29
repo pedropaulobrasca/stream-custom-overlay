@@ -55,8 +55,8 @@ export default function TestPanelPage() {
 
     setTestEvents(prev => [event, ...prev.slice(0, 9)]); // Keep last 10 events
 
-    // If it's a keyboard blocking action, execute it via API
-    if (['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type)) {
+    // If it's a keyboard action (blocking or pressing), execute it via API
+    if (['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(action.type)) {
       try {
         const response = await api.post(`/actions/${action.id}/execute`, {
           triggeredBy: `test_panel_${testUsername}`
@@ -66,8 +66,13 @@ export default function TestPanelPage() {
         toast.success(`🎮 ${action.name} executed! ${data.desktopClientsNotified} desktop clients notified.`);
         
         if (data.punishment) {
-          const keyName = data.punishment.type.replace('block_key_', '').toUpperCase();
-          toast.info(`🚫 Blocking ${keyName} key for ${data.punishment.duration / 1000}s`);
+          if (data.punishment.type.startsWith('block_key_')) {
+            const keyName = data.punishment.type.replace('block_key_', '').toUpperCase();
+            toast.info(`🚫 Blocking ${keyName} key for ${data.punishment.duration / 1000}s`);
+          } else if (data.punishment.type.startsWith('press_key_')) {
+            const keyName = data.punishment.type.replace('press_key_', '').toUpperCase();
+            toast.info(`⚡ Pressed ${keyName} key automatically!`);
+          }
         }
 
         // Create a manual execution event for overlay to show
@@ -335,10 +340,15 @@ export default function TestPanelPage() {
                       <Badge variant="outline">
                         {['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type) 
                           ? `${duration}s` 
+                          : action.type === 'press_key'
+                          ? `${duration}s cooldown`
                           : `${duration}min`}
                       </Badge>
                       {['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type) && (
-                        <Badge variant="destructive" className="text-xs">🚫 Keyboard</Badge>
+                        <Badge variant="destructive" className="text-xs">🚫 Block</Badge>
+                      )}
+                      {action.type === 'press_key' && (
+                        <Badge variant="default" className="text-xs">⚡ Press</Badge>
                       )}
                     </div>
                   </div>

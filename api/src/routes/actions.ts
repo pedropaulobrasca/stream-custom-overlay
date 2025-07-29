@@ -221,6 +221,13 @@ router.post("/:id/execute", async (req: AuthenticatedRequest, res) => {
         punishmentType = 'block_key_f';
         duration = (config.duration || 2) * 1000;
         break;
+
+      case 'press_key':
+        // Map skill keys to press types
+        const pressKey = config.skillKey || 'e';
+        punishmentType = `press_key_${pressKey.toLowerCase()}`;
+        duration = 0; // Instant key press, no duration
+        break;
       
       default:
         return res.status(400).json({ error: "Unsupported action type for desktop execution" });

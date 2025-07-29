@@ -13,6 +13,7 @@ export class KeyboardController extends EventEmitter {
     'q': 'Q',  
     'w': 'W',
     'r': 'R',
+    'a': 'A',
     'd': 'D',
     'f': 'F',
     'space': 'Space',
@@ -22,6 +23,7 @@ export class KeyboardController extends EventEmitter {
     '3': '3',
     '4': '4',
     '5': '5',
+    'shift+o': 'Shift+O',
   };
 
   constructor() {
@@ -129,6 +131,50 @@ export class KeyboardController extends EventEmitter {
     
     // Emit event for UI updates
     this.emit('key-blocked-end', { key: normalizedKey });
+  }
+
+  public pressKey(key: string): void {
+    const normalizedKey = key.toLowerCase();
+    
+    if (!this.KEY_ACCELERATORS[normalizedKey]) {
+      console.error(`Unsupported key for press: ${key}`);
+      return;
+    }
+
+    console.log(`Pressing key: ${normalizedKey.toUpperCase()}`);
+
+    // For Electron, we'll simulate a key press by sending it to the focused window
+    // This is a simplified implementation - in a real scenario you might need 
+    // more sophisticated key simulation
+    try {
+      const { BrowserWindow } = require('electron');
+      const focusedWindow = BrowserWindow.getFocusedWindow();
+      
+      if (focusedWindow) {
+        // Send key events to the focused window
+        focusedWindow.webContents.sendInputEvent({
+          type: 'keyDown',
+          keyCode: normalizedKey.toUpperCase()
+        });
+        
+        // Add a small delay then send keyUp
+        setTimeout(() => {
+          focusedWindow.webContents.sendInputEvent({
+            type: 'keyUp', 
+            keyCode: normalizedKey.toUpperCase()
+          });
+        }, 50);
+      }
+      
+      // Emit event for UI updates
+      this.emit('key-pressed', { 
+        key: normalizedKey, 
+        timestamp: Date.now() 
+      });
+      
+    } catch (error) {
+      console.error(`Error pressing key ${key}:`, error);
+    }
   }
 
   public getBlockedKeys(): string[] {

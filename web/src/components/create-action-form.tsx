@@ -142,9 +142,10 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   <SelectValue placeholder="Select action type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="disable_skill">🚫 Block Skill Key (E/Q/W/R)</SelectItem>
+                  <SelectItem value="disable_skill">🚫 Block Skill Key (Q/W/E/R/A/D/F/1/2/SHIFT+O)</SelectItem>
                   <SelectItem value="disable_movement">🚶 Block Movement (W)</SelectItem>
                   <SelectItem value="disable_interaction">🤏 Block Interaction (F)</SelectItem>
+                  <SelectItem value="press_key">⚡ Press Key (Auto-cast skill)</SelectItem>
                   <SelectItem value="stream-action">⚡ General Stream Action</SelectItem>
                   <SelectItem value="visual-effect">🎨 Visual Effect</SelectItem>
                   <SelectItem value="sound-effect">🔊 Sound Effect</SelectItem>
@@ -152,26 +153,37 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
               </Select>
             </div>
 
-            {/* Skill Key Selection for disable_skill type */}
-            {formData.type === 'disable_skill' && (
+            {/* Key Selection for disable_skill and press_key types */}
+            {(formData.type === 'disable_skill' || formData.type === 'press_key') && (
               <div className="space-y-2">
-                <Label htmlFor="skillKey">Skill Key to Block</Label>
+                <Label htmlFor="skillKey">
+                  {formData.type === 'disable_skill' ? 'Key to Block' : 'Key to Press'}
+                </Label>
                 <Select
                   value={formData.skillKey}
                   onValueChange={(value) => setFormData(prev => ({ ...prev, skillKey: value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select skill key" />
+                    <SelectValue placeholder="Select key" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="q">Q - First Skill</SelectItem>
-                    <SelectItem value="w">W - Second Skill</SelectItem>
+                    <SelectItem value="w">W - Second Skill / Movement</SelectItem>
                     <SelectItem value="e">E - Third Skill</SelectItem>
                     <SelectItem value="r">R - Ultimate Skill</SelectItem>
+                    <SelectItem value="a">A - Left Movement</SelectItem>
+                    <SelectItem value="d">D - Right Movement</SelectItem>
+                    <SelectItem value="f">F - Interaction</SelectItem>
+                    <SelectItem value="1">1 - Consumable Slot 1</SelectItem>
+                    <SelectItem value="2">2 - Consumable Slot 2</SelectItem>
+                    <SelectItem value="shift+o">SHIFT+O - Mount/Dismount</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="text-xs text-muted-foreground">
-                  Choose which skill key will be blocked when this action is executed
+                  {formData.type === 'disable_skill' 
+                    ? 'Choose which key will be blocked when this action is executed'
+                    : 'Choose which key will be automatically pressed when this action is executed'
+                  }
                 </div>
               </div>
             )}
@@ -257,19 +269,26 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                 <Label htmlFor="duration">
                   {['disable_skill', 'disable_movement', 'disable_interaction'].includes(formData.type) 
                     ? 'Duration (seconds)' 
+                    : formData.type === 'press_key'
+                    ? 'Cooldown (seconds)'
                     : 'Duration (minutes)'}
                 </Label>
                 <Input
                   id="duration"
                   type="number"
                   min="1"
-                  max={['disable_skill', 'disable_movement', 'disable_interaction'].includes(formData.type) ? "30" : "60"}
+                  max={['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(formData.type) ? "30" : "60"}
                   value={formData.duration}
                   onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) || 0 }))}
                 />
                 {['disable_skill', 'disable_movement', 'disable_interaction'].includes(formData.type) && (
                   <div className="text-xs text-muted-foreground">
                     How long the key will be blocked (1-30 seconds)
+                  </div>
+                )}
+                {formData.type === 'press_key' && (
+                  <div className="text-xs text-muted-foreground">
+                    Cooldown before the action can be triggered again (1-30 seconds)
                   </div>
                 )}
               </div>
@@ -325,14 +344,28 @@ export function CreateActionForm({ onActionCreated, onCancel }: CreateActionForm
                   <span className="capitalize">{formData.type.replace("-", " ")}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Duration:</span>
                   <span>
-                    {formData.duration} {['disable_skill', 'disable_movement', 'disable_interaction'].includes(formData.type) ? 'seconds' : 'minutes'}
+                    {['disable_skill', 'disable_movement', 'disable_interaction'].includes(formData.type) 
+                      ? 'Duration:' 
+                      : formData.type === 'press_key'
+                      ? 'Cooldown:'
+                      : 'Duration:'}
+                  </span>
+                  <span>
+                    {formData.duration} {['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(formData.type) ? 'seconds' : 'minutes'}
                   </span>
                 </div>
                 {formData.type === 'disable_skill' && (
                   <div className="flex justify-between">
                     <span>Blocks Key:</span>
+                    <span className="uppercase font-mono bg-muted px-2 py-1 rounded text-xs">
+                      {formData.skillKey}
+                    </span>
+                  </div>
+                )}
+                {formData.type === 'press_key' && (
+                  <div className="flex justify-between">
+                    <span>Presses Key:</span>
                     <span className="uppercase font-mono bg-muted px-2 py-1 rounded text-xs">
                       {formData.skillKey}
                     </span>
