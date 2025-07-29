@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,21 +56,21 @@ export default function TestPanelPage() {
     setTestEvents(prev => [event, ...prev.slice(0, 9)]); // Keep last 10 events
 
     // If it's a keyboard action (blocking or pressing), execute it via API
-    if (['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(action.type)) {
+    if (["disable_skill", "press_key"].includes(action.type)) {
       try {
         const response = await api.post(`/actions/${action.id}/execute`, {
-          triggeredBy: `test_panel_${testUsername}`
+          triggeredBy: `test_panel_${testUsername}`,
         });
-        
+
         const data = response.data;
         toast.success(`🎮 ${action.name} executed! ${data.desktopClientsNotified} desktop clients notified.`);
-        
+
         if (data.punishment) {
-          if (data.punishment.type.startsWith('block_key_')) {
-            const keyName = data.punishment.type.replace('block_key_', '').toUpperCase();
+          if (data.punishment.type.startsWith("block_key_")) {
+            const keyName = data.punishment.type.replace("block_key_", "").toUpperCase();
             toast.info(`🚫 Blocking ${keyName} key for ${data.punishment.duration / 1000}s`);
-          } else if (data.punishment.type.startsWith('press_key_')) {
-            const keyName = data.punishment.type.replace('press_key_', '').toUpperCase();
+          } else if (data.punishment.type.startsWith("press_key_")) {
+            const keyName = data.punishment.type.replace("press_key_", "").toUpperCase();
             toast.info(`⚡ Pressed ${keyName} key automatically!`);
           }
         }
@@ -79,7 +79,7 @@ export default function TestPanelPage() {
         const manualEvent = {
           ...event,
           bits: 0, // 0 bits to indicate manual execution
-          username: `${testUsername} (Test)`
+          username: `${testUsername} (Test)`,
         };
 
         // Update the event in storage for overlay
@@ -103,8 +103,8 @@ export default function TestPanelPage() {
         }
 
       } catch (error: any) {
-        console.error('Failed to execute keyboard action:', error);
-        toast.error('Failed to execute keyboard action: ' + (error.response?.data?.error || error.message));
+        console.error("Failed to execute keyboard action:", error);
+        toast.error("Failed to execute keyboard action: " + (error.response?.data?.error || error.message));
       }
     } else {
       // Regular overlay action - show normal toast
@@ -338,16 +338,16 @@ export default function TestPanelPage() {
                     <div className="flex gap-2">
                       <Badge variant="secondary">{bitCost} bits</Badge>
                       <Badge variant="outline">
-                        {['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type) 
-                          ? `${duration}s` 
-                          : action.type === 'press_key'
-                          ? `${duration}s cooldown`
-                          : `${duration}min`}
+                        {action.type === "disable_skill"
+                          ? `${duration}s`
+                          : action.type === "press_key"
+                            ? `${duration}s cooldown`
+                            : `${duration}min`}
                       </Badge>
-                      {['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type) && (
+                      {action.type === "disable_skill" && (
                         <Badge variant="destructive" className="text-xs">🚫 Block</Badge>
                       )}
-                      {action.type === 'press_key' && (
+                      {action.type === "press_key" && (
                         <Badge variant="default" className="text-xs">⚡ Press</Badge>
                       )}
                     </div>

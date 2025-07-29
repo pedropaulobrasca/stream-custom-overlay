@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { CreateActionForm } from "@/components/create-action-form";
 import { useActions } from "@/hooks/useActions";
-import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -39,7 +38,6 @@ function ActionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  const { user } = useAuth();
   const { actions, loading, error, refreshActions } = useActions();
 
   const filteredActions = actions.filter(action =>
@@ -47,7 +45,7 @@ function ActionsPage() {
     (action.description && action.description.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
-  const handleEdit = (action: any) => {
+  const handleEdit = (action: { id: string; name: string }) => {
     console.log("Edit action:", action);
     toast.info("Edit functionality coming soon");
   };
@@ -57,8 +55,8 @@ function ActionsPage() {
       await api.delete(`/actions/${id}`);
       toast.success("Action deleted successfully");
       refreshActions();
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to delete action");
+    } catch (error: unknown) {
+      toast.error((error as any)?.response?.data?.error || "Failed to delete action");
     }
   };
 
@@ -67,8 +65,8 @@ function ActionsPage() {
       await api.patch(`/actions/${id}/toggle`);
       toast.success("Action status updated");
       refreshActions();
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to update action status");
+    } catch (error: unknown) {
+      toast.error((error as any)?.response?.data?.error || "Failed to update action status");
     }
   };
 
@@ -153,18 +151,19 @@ function ActionsPage() {
               <TableRow>
                 <TableHead className="w-16">Icon</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Game</TableHead>
+                <TableHead className="w-40">Type</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead className="w-24">Bits</TableHead>
-                <TableHead className="w-24">Status</TableHead>
-                <TableHead className="w-32">Actions</TableHead>
+                <TableHead className="w-20 text-center">Bits</TableHead>
+                <TableHead className="w-24 text-center">Duration</TableHead>
+                <TableHead className="w-20 text-center">Status</TableHead>
+                <TableHead className="w-16 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredActions.map((action) => (
                 <TableRow key={action.id}>
                   <TableCell>
-                    <div className="flex items-center justify-center h-12 w-12 rounded bg-muted overflow-hidden">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-md bg-muted overflow-hidden">
                       {action.config?.albionItem ? (
                         <img
                           src={action.config.albionItem.imageUrl}
@@ -185,26 +184,70 @@ function ActionsPage() {
                   </TableCell>
                   <TableCell className="font-medium">{action.name}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                      <span className="text-sm font-medium">Stream</span>
+                    <div className="flex flex-wrap gap-1">
+                      {action.type === "disable_skill" && (
+                        <>
+                          <Badge variant="destructive" className="text-xs">
+                            🚫 Block Key
+                          </Badge>
+                          {action.config?.skillKey && (
+                            <Badge variant="outline" className="text-xs font-mono">
+                              {action.config.skillKey.toUpperCase()}
+                            </Badge>
+                          )}
+                        </>
+                      )}
+                      {action.type === "press_key" && (
+                        <>
+                          <Badge variant="default" className="text-xs">
+                            ⚡ Press Key
+                          </Badge>
+                          {action.config?.skillKey && (
+                            <Badge variant="outline" className="text-xs font-mono">
+                              {action.config.skillKey.toUpperCase()}
+                            </Badge>
+                          )}
+                        </>
+                      )}
+                      {action.type === "stream-action" && (
+                        <Badge variant="secondary" className="text-xs">
+                          ⚡ General
+                        </Badge>
+                      )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {action.description || ""}
+                  <TableCell className="text-muted-foreground text-sm">
+                    {action.description || "No description"}
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {action.config?.bitCost || 100} bits
+                  <TableCell className="text-center">
+                    <Badge variant="outline" className="text-xs">
+                      {action.config?.bitCost || 100}
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant={action.isActive ? "default" : "secondary"}>
+                  <TableCell className="text-center">
+                    {(action.type === "disable_skill" || action.type === "press_key") && action.config?.duration ? (
+                      <div className="flex flex-col items-center">
+                        <span className="text-sm font-medium">{action.config.duration}s</span>
+                        <span className="text-xs text-muted-foreground">
+                          {action.type === "press_key" ? "cooldown" : "duration"}
+                        </span>
+                      </div>
+                    ) : action.type === "stream-action" && action.config?.duration ? (
+                      <div className="flex flex-col items-center">
+                        <span className="text-sm font-medium">{action.config.duration}m</span>
+                        <span className="text-xs text-muted-foreground">duration</span>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant={action.isActive ? "default" : "secondary"} className="text-xs">
                       {action.isActive ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">

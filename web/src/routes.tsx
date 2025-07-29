@@ -1,10 +1,9 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/app-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import LandingPage from "./pages/landing";
 import LoginPage from "./pages/login";
 import AuthCallbackPage from "./pages/auth-callback";
-import DashboardPage from "./pages/dashboard";
 import ActionsPage from "./pages/actions";
 import OverlaysPage from "./pages/overlays";
 import OverlayPage from "./pages/overlay";
@@ -22,7 +21,7 @@ export function AppRoutes() {
           <AppLayout />
         </ProtectedRoute>
       }>
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route index element={<Navigate to="/actions" replace />} />
         <Route path="actions" element={<ActionsPage />} />
         <Route path="overlays" element={<OverlaysPage />} />
         <Route path="test-panel" element={<TestPanelPage />} />

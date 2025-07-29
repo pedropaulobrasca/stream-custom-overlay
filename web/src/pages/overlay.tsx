@@ -61,39 +61,39 @@ export default function OverlayPage(): React.ReactElement {
   // Execute keyboard action when clicked
   const executeKeyboardAction = async (action: Action) => {
     // Only execute if it's a keyboard action and not currently active (for blocking actions)
-    if (!['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(action.type)) {
+    if (!["disable_skill", "press_key"].includes(action.type)) {
       return;
     }
 
     const timer = actionTimers[action.id];
     // For blocking actions, don't execute if already active
     // For press_key actions, allow execution even if on cooldown
-    if (timer?.isActive && ['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type)) {
+    if (timer?.isActive && action.type === "disable_skill") {
       return; // Blocking action already active
     }
 
     try {
       const response = await api.post(`/actions/${action.id}/execute`, {
-        triggeredBy: 'overlay_click'
+        triggeredBy: "overlay_click",
       });
-      
-      console.log('Keyboard action executed from overlay:', response.data);
+
+      console.log("Keyboard action executed from overlay:", response.data);
 
       // Create a manual execution event to show in overlay
       const manualEvent = {
         id: `manual_${Date.now()}`,
         actionId: action.id,
         actionName: action.name,
-        username: 'Manual',
+        username: "Manual",
         bits: 0, // 0 bits for manual execution
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       // Process this event to activate the timer
       processEvents([manualEvent]);
 
     } catch (error: any) {
-      console.error('Failed to execute keyboard action from overlay:', error);
+      console.error("Failed to execute keyboard action from overlay:", error);
     }
   };
 
@@ -113,10 +113,10 @@ export default function OverlayPage(): React.ReactElement {
         if (overlay) {
           // Get actions for this overlay using the public route
           // For default overlay, pass userId as query parameter
-          const actionsUrl = overlayId === "default" 
+          const actionsUrl = overlayId === "default"
             ? `/api/overlays/public/${overlayId}/actions?userId=${userId}`
             : `/api/overlays/public/${overlayId}/actions`;
-          
+
           const actionsResponse = await fetch(actionsUrl);
           if (!actionsResponse.ok) {
             throw new Error("Failed to fetch overlay actions");
@@ -202,8 +202,8 @@ export default function OverlayPage(): React.ReactElement {
           if (action && updated[actionId]) {
             const activatedAt = new Date(event.timestamp);
             // Use seconds for keyboard actions, minutes for others
-            const durationMs = ['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(action.type) 
-              ? action.config.duration * 1000 
+            const durationMs = ["disable_skill", "press_key"].includes(action.type)
+              ? action.config.duration * 1000
               : action.config.duration * 60 * 1000;
             const endsAt = new Date(activatedAt.getTime() + durationMs);
             const now = new Date();
@@ -499,8 +499,8 @@ export default function OverlayPage(): React.ReactElement {
           const timer = actionTimers[action.id];
           const isActive = timer?.isActive || false;
           const remainingSeconds = timer?.remainingSeconds || 0;
-          const isKeyboardAction = ['disable_skill', 'disable_movement', 'disable_interaction', 'press_key'].includes(action.type);
-          const isBlockingAction = ['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type);
+          const isKeyboardAction = ["disable_skill", "press_key"].includes(action.type);
+          const isBlockingAction = action.type === "disable_skill";
           const canExecute = isKeyboardAction && (!isActive || !isBlockingAction);
 
           // Format remaining time as MM:SS
@@ -513,16 +513,16 @@ export default function OverlayPage(): React.ReactElement {
           return (
             <div
               key={action.id}
-              className={`relative flex flex-col items-center ${canExecute ? 'cursor-pointer hover:scale-105 transition-transform' : ''}`}
+              className={`relative flex flex-col items-center ${canExecute ? "cursor-pointer hover:scale-105 transition-transform" : ""}`}
               onClick={() => canExecute && executeKeyboardAction(action)}
             >
               {/* Main Item Image */}
               <div className={`${
                 isActive ? "ring-4 ring-red-400 bg-red-800" :
-                  isTriggered ? "ring-4 ring-green-400 bg-green-800" : 
-                  canExecute ? "ring-2 ring-blue-400/50 bg-blue-900/20 hover:ring-blue-400" :
-                  "ring-2 ring-white/20 bg-black/20"
-              } w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group ${canExecute ? 'hover:scale-110' : ''}`}>
+                  isTriggered ? "ring-4 ring-green-400 bg-green-800" :
+                    canExecute ? "ring-2 ring-blue-400/50 bg-blue-900/20 hover:ring-blue-400" :
+                      "ring-2 ring-white/20 bg-black/20"
+              } w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group ${canExecute ? "hover:scale-110" : ""}`}>
                 {action.config.albionItem ? (
                   <img
                     src={getAlbionItemImageUrl(action.config.albionItem.uniqueName, action.config.albionItem.quality)}

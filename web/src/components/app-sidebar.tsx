@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  LayoutDashboard,
   List,
   TestTube,
   Layers,
@@ -23,27 +22,17 @@ import { useAuth } from "@/contexts/AuthContext";
 
 // Navigation groups organized by functionality
 const navigationGroups = [
-  // Dashboard - standalone at the top
+  // Stream group - core streaming functionality
   {
+    title: "Stream",
     items: [
       {
-        title: "Dashboard",
-        url: "/dashboard",
-        icon: LayoutDashboard,
-      },
-    ],
-  },
-  // Overlay group - core streaming functionality
-  {
-    title: "Overlay",
-    items: [
-      {
-        title: "Stream Actions",
+        title: "Actions",
         url: "/actions",
         icon: List,
       },
       {
-        title: "Stream Overlays",
+        title: "Overlays",
         url: "/overlays",
         icon: Layers,
       },
@@ -54,15 +43,15 @@ const navigationGroups = [
       },
     ],
   },
-  // Tools group - future Albion tools
+  // Tools group - Albion tools
   {
     title: "Tools",
     items: [
       {
-        title: "Item Pricce",
+        title: "Item Price",
         url: "/item-price",
         icon: DollarSign,
-      }
+      },
     ],
   },
 ];

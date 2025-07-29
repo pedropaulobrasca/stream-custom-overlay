@@ -199,38 +199,30 @@ router.post("/:id/execute", async (req: AuthenticatedRequest, res) => {
 
     // Extract punishment details from action config
     const config = existingAction[0].config as any;
-    
+
     // Generate punishment based on action type
-    let punishmentType = '';
+    let punishmentType = "";
     let duration = 5000; // default 5 seconds
 
     switch (existingAction[0].type) {
-      case 'disable_skill':
-        // Map skill keys to punishment types
-        const skillKey = config.skillKey || 'e';
-        punishmentType = `block_key_${skillKey.toLowerCase()}`;
-        duration = (config.duration || 5) * 1000;
-        break;
-      
-      case 'disable_movement':
-        punishmentType = 'block_key_w';
-        duration = (config.duration || 3) * 1000;
-        break;
-      
-      case 'disable_interaction':
-        punishmentType = 'block_key_f';
-        duration = (config.duration || 2) * 1000;
-        break;
+    case "disable_skill": {
+      // Map skill keys to punishment types
+      const skillKey = config.skillKey || "e";
+      punishmentType = `block_key_${skillKey.toLowerCase()}`;
+      duration = (config.duration || 5) * 1000;
+      break;
+    }
 
-      case 'press_key':
-        // Map skill keys to press types
-        const pressKey = config.skillKey || 'e';
-        punishmentType = `press_key_${pressKey.toLowerCase()}`;
-        duration = 0; // Instant key press, no duration
-        break;
-      
-      default:
-        return res.status(400).json({ error: "Unsupported action type for desktop execution" });
+    case "press_key": {
+      // Map skill keys to press types
+      const pressKey = config.skillKey || "e";
+      punishmentType = `press_key_${pressKey.toLowerCase()}`;
+      duration = 0; // Instant key press, no duration
+      break;
+    }
+
+    default:
+      return res.status(400).json({ error: "Unsupported action type for desktop execution" });
     }
 
     // Create punishment object
@@ -238,16 +230,18 @@ router.post("/:id/execute", async (req: AuthenticatedRequest, res) => {
       id: `punishment_${Date.now()}_${Math.random().toString(36).substring(2)}`,
       type: punishmentType,
       duration: duration,
-      triggeredBy: triggeredBy || 'manual'
+      triggeredBy: triggeredBy || "manual",
     };
 
     // Send punishment to desktop clients
     desktopWS.sendPunishment(punishment);
 
     // Schedule punishment end notification
-    setTimeout(() => {
-      desktopWS.sendPunishmentEnd(punishment.id);
-    }, duration);
+    if (duration > 0) {
+      globalThis.setTimeout(() => {
+        desktopWS.sendPunishmentEnd(punishment.id);
+      }, duration);
+    }
 
     console.log(`Executed action ${existingAction[0].name} - Punishment:`, punishment);
 
@@ -255,7 +249,7 @@ router.post("/:id/execute", async (req: AuthenticatedRequest, res) => {
       success: true,
       punishment,
       action: existingAction[0],
-      desktopClientsNotified: desktopWS.getAuthenticatedClientsCount()
+      desktopClientsNotified: desktopWS.getAuthenticatedClientsCount(),
     });
 
   } catch (error) {

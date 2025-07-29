@@ -111,7 +111,7 @@ export default function OverlaysPage(): React.ReactElement {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => copyToClipboard('default')}
+                      onClick={() => copyToClipboard("default")}
                       className="h-8 w-8"
                     >
                       <Copy className="h-4 w-4" />
@@ -119,7 +119,7 @@ export default function OverlaysPage(): React.ReactElement {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => window.open(`${window.location.origin}/overlay/${user?.userId}/default`, '_blank')}
+                      onClick={() => window.open(`${window.location.origin}/overlay/${user?.userId}/default`, "_blank")}
                       className="h-8 w-8"
                     >
                       <ExternalLink className="h-4 w-4" />
@@ -199,7 +199,7 @@ export default function OverlaysPage(): React.ReactElement {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleEdit(overlay)}
+                          onClick={() => handleEdit()}
                           className="h-8 w-8"
                         >
                           <Edit className="h-4 w-4" />
@@ -207,7 +207,7 @@ export default function OverlaysPage(): React.ReactElement {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleDelete(overlay)}
+                          onClick={() => handleDelete()}
                           className="h-8 w-8 text-destructive hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />

@@ -69,7 +69,7 @@ router.get("/public/:id/actions", async (req, res) => {
         .from(actions)
         .where(and(
           eq(actions.userId, userId as string),
-          eq(actions.isActive, true)
+          eq(actions.isActive, true),
         ));
 
       return res.json(userActions);
@@ -94,7 +94,7 @@ router.get("/public/:id/actions", async (req, res) => {
         .from(actions)
         .where(and(
           inArray(actions.id, config.actions),
-          eq(actions.isActive, true)
+          eq(actions.isActive, true),
         ));
 
       res.json(overlayActions);
