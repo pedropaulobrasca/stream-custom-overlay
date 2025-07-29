@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Edit2, Trash2, MoreVertical, Power, PowerOff, Play } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, MoreVertical, Power, PowerOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { CreateActionForm } from "@/components/create-action-form";
 import { useActions } from "@/hooks/useActions";
+import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -38,6 +39,7 @@ function ActionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
 
+  const { user } = useAuth();
   const { actions, loading, error, refreshActions } = useActions();
 
   const filteredActions = actions.filter(action =>
@@ -75,26 +77,6 @@ function ActionsPage() {
     refreshActions();
   };
 
-  const handleExecute = async (id: string, actionName: string) => {
-    try {
-      const response = await api.post(`/actions/${id}/execute`, {
-        triggeredBy: 'manual_web'
-      });
-      
-      const data = response.data;
-      toast.success(`Action "${actionName}" executed successfully! ${data.desktopClientsNotified} desktop clients notified.`);
-      
-      if (data.punishment) {
-        toast.info(`Blocking ${data.punishment.type.replace('block_key_', '').toUpperCase()} key for ${data.punishment.duration / 1000}s`);
-      }
-    } catch (error: any) {
-      if (error.response?.status === 400 && error.response?.data?.error?.includes('not active')) {
-        toast.error('Action is not active. Please activate it first.');
-      } else {
-        toast.error(error.response?.data?.error || 'Failed to execute action');
-      }
-    }
-  };
 
   if (loading) {
     return (
@@ -223,16 +205,6 @@ function ActionsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleExecute(action.id, action.name)}
-                        disabled={!action.isActive}
-                        className="text-xs"
-                      >
-                        <Play className="h-3 w-3 mr-1" />
-                        Execute
-                      </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">

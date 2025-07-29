@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Play, Zap } from "lucide-react";
 import { useActions } from "@/hooks/useActions";
 import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/lib/api";
 
 interface Action {
   id: string;
@@ -54,9 +55,56 @@ export default function TestPanelPage() {
 
     setTestEvents(prev => [event, ...prev.slice(0, 9)]); // Keep last 10 events
 
-    // Here you would normally send this event to the overlay via WebSocket or similar
-    // For now, we'll just show a toast and store it locally
-    toast.success(`🎉 ${action.name} triggered! ${bitsUsed} bits from ${testUsername}`);
+    // If it's a keyboard blocking action, execute it via API
+    if (['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type)) {
+      try {
+        const response = await api.post(`/actions/${action.id}/execute`, {
+          triggeredBy: `test_panel_${testUsername}`
+        });
+        
+        const data = response.data;
+        toast.success(`🎮 ${action.name} executed! ${data.desktopClientsNotified} desktop clients notified.`);
+        
+        if (data.punishment) {
+          const keyName = data.punishment.type.replace('block_key_', '').toUpperCase();
+          toast.info(`🚫 Blocking ${keyName} key for ${data.punishment.duration / 1000}s`);
+        }
+
+        // Create a manual execution event for overlay to show
+        const manualEvent = {
+          ...event,
+          bits: 0, // 0 bits to indicate manual execution
+          username: `${testUsername} (Test)`
+        };
+
+        // Update the event in storage for overlay
+        const overlayKey = `overlay_${user?.userId}_events`;
+        const existingEvents = JSON.parse(localStorage.getItem(overlayKey) || "[]");
+        existingEvents.unshift(manualEvent);
+        const updatedEvents = existingEvents.slice(0, 50);
+        localStorage.setItem(overlayKey, JSON.stringify(updatedEvents));
+
+        // Broadcast to overlay
+        try {
+          const channel = new BroadcastChannel(`overlay_${user?.userId}`);
+          channel.postMessage({
+            type: "NEW_EVENT",
+            event: manualEvent,
+            allEvents: updatedEvents,
+          });
+          channel.close();
+        } catch (error) {
+          console.log("BroadcastChannel not supported:", error);
+        }
+
+      } catch (error: any) {
+        console.error('Failed to execute keyboard action:', error);
+        toast.error('Failed to execute keyboard action: ' + (error.response?.data?.error || error.message));
+      }
+    } else {
+      // Regular overlay action - show normal toast
+      toast.success(`🎉 ${action.name} triggered! ${bitsUsed} bits from ${testUsername}`);
+    }
 
     // Store in localStorage so overlay can potentially read it (simple demo)
     const overlayKey = `overlay_${user?.userId}_events`;
@@ -284,7 +332,14 @@ export default function TestPanelPage() {
                     <CardTitle className="text-lg">{action.name}</CardTitle>
                     <div className="flex gap-2">
                       <Badge variant="secondary">{bitCost} bits</Badge>
-                      <Badge variant="outline">{duration}min</Badge>
+                      <Badge variant="outline">
+                        {['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type) 
+                          ? `${duration}s` 
+                          : `${duration}min`}
+                      </Badge>
+                      {['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type) && (
+                        <Badge variant="destructive" className="text-xs">🚫 Keyboard</Badge>
+                      )}
                     </div>
                   </div>
                 </div>

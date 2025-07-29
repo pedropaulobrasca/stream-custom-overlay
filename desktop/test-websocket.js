@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 
 // Test WebSocket connection to the API
-const ws = new WebSocket('ws://localhost:3001/streamer-events?token=test123');
+const ws = new WebSocket('ws://172.19.252.199:3001/streamer-events?token=test123');
 
 ws.on('open', function open() {
   console.log('✅ Connected to API WebSocket');

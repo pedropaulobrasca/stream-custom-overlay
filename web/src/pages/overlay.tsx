@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getAlbionItemImageUrl } from "@/lib/albion-utils";
+import { api } from "@/lib/api";
 
 
 
@@ -15,6 +16,7 @@ interface Action {
   id: string;
   name: string;
   description: string;
+  type: string;
   config: {
     emoji: string;
     bitCost: number;
@@ -55,6 +57,43 @@ export default function OverlayPage(): React.ReactElement {
   const [triggeredActions, setTriggeredActions] = useState<TriggeredAction[]>([]);
   const [, setRecentEvents] = useState<TestEvent[]>([]);
   const [actionTimers, setActionTimers] = useState<Record<string, ActionTimer>>({});
+
+  // Execute keyboard action when clicked
+  const executeKeyboardAction = async (action: Action) => {
+    // Only execute if it's a keyboard blocking action and not currently active
+    if (!['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type)) {
+      return;
+    }
+
+    const timer = actionTimers[action.id];
+    if (timer?.isActive) {
+      return; // Action already active
+    }
+
+    try {
+      const response = await api.post(`/actions/${action.id}/execute`, {
+        triggeredBy: 'overlay_click'
+      });
+      
+      console.log('Keyboard action executed from overlay:', response.data);
+
+      // Create a manual execution event to show in overlay
+      const manualEvent = {
+        id: `manual_${Date.now()}`,
+        actionId: action.id,
+        actionName: action.name,
+        username: 'Manual',
+        bits: 0, // 0 bits for manual execution
+        timestamp: new Date()
+      };
+
+      // Process this event to activate the timer
+      processEvents([manualEvent]);
+
+    } catch (error: any) {
+      console.error('Failed to execute keyboard action from overlay:', error);
+    }
+  };
 
   // Fetch actions from API and overlay data
   useEffect(() => {
@@ -146,7 +185,7 @@ export default function OverlayPage(): React.ReactElement {
           const actionId = event.actionId;
           const action = actions.find(a => a.id === actionId);
 
-          if (action && event.bits >= action.config.bitCost) {
+          if (action && (event.bits >= action.config.bitCost || event.bits === 0)) {
             // Only keep the latest activation for each action
             if (!latestActivations[actionId] ||
                   new Date(event.timestamp) > new Date(latestActivations[actionId].timestamp)) {
@@ -160,7 +199,11 @@ export default function OverlayPage(): React.ReactElement {
           const action = actions.find(a => a.id === actionId);
           if (action && updated[actionId]) {
             const activatedAt = new Date(event.timestamp);
-            const endsAt = new Date(activatedAt.getTime() + (action.config.duration * 60 * 1000));
+            // Use seconds for keyboard actions, minutes for others
+            const durationMs = ['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type) 
+              ? action.config.duration * 1000 
+              : action.config.duration * 60 * 1000;
+            const endsAt = new Date(activatedAt.getTime() + durationMs);
             const now = new Date();
             const remainingMs = endsAt.getTime() - now.getTime();
 
@@ -454,6 +497,8 @@ export default function OverlayPage(): React.ReactElement {
           const timer = actionTimers[action.id];
           const isActive = timer?.isActive || false;
           const remainingSeconds = timer?.remainingSeconds || 0;
+          const isKeyboardAction = ['disable_skill', 'disable_movement', 'disable_interaction'].includes(action.type);
+          const canExecute = isKeyboardAction && !isActive;
 
           // Format remaining time as MM:SS
           const formatTime = (seconds: number): string => {
@@ -465,13 +510,16 @@ export default function OverlayPage(): React.ReactElement {
           return (
             <div
               key={action.id}
-              className="relative flex flex-col items-center"
+              className={`relative flex flex-col items-center ${canExecute ? 'cursor-pointer hover:scale-105 transition-transform' : ''}`}
+              onClick={() => canExecute && executeKeyboardAction(action)}
             >
               {/* Main Item Image */}
               <div className={`${
                 isActive ? "ring-4 ring-red-400 bg-red-800" :
-                  isTriggered ? "ring-4 ring-green-400 bg-green-800" : "ring-2 ring-white/20 bg-black/20"
-              } w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group hover:scale-110`}>
+                  isTriggered ? "ring-4 ring-green-400 bg-green-800" : 
+                  canExecute ? "ring-2 ring-blue-400/50 bg-blue-900/20 hover:ring-blue-400" :
+                  "ring-2 ring-white/20 bg-black/20"
+              } w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group ${canExecute ? 'hover:scale-110' : ''}`}>
                 {action.config.albionItem ? (
                   <img
                     src={getAlbionItemImageUrl(action.config.albionItem.uniqueName, action.config.albionItem.quality)}
@@ -495,6 +543,13 @@ export default function OverlayPage(): React.ReactElement {
                     <div className="text-white text-xs font-bold">
                       {formatTime(remainingSeconds)}
                     </div>
+                  </div>
+                )}
+
+                {/* Keyboard Action Indicator */}
+                {canExecute && (
+                  <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    ⚡
                   </div>
                 )}
               </div>
@@ -522,7 +577,7 @@ export default function OverlayPage(): React.ReactElement {
                   <div
                     className="h-full bg-red-400 transition-all duration-1000 ease-out"
                     style={{
-                      width: `${Math.max(0, (remainingSeconds / (action.config.duration * 60)) * 100)}%`,
+                      width: `${Math.max(0, (remainingSeconds / (isKeyboardAction ? action.config.duration : action.config.duration * 60)) * 100)}%`,
                     }}
                   />
                 </div>

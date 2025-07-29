@@ -38,8 +38,7 @@
       "assets/**/*"
     ],
     "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
+      "target": "portable"
     },
     "mac": {
       "target": "dmg",
