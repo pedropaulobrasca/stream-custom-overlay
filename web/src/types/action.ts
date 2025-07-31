@@ -13,14 +13,22 @@ export interface Action {
 export type ActionType =
   | "disable_skill"
   | "press_key"
-  | "stream-action";
+  | "stream-action"
+  | "simple-action";
 
 export interface ActionConfig {
   emoji: string;
   bitCost: number;
-  duration: number;
+  duration?: number;
+  timer?: number;
   skillKey?: string;
   albionItem?: AlbionItemConfig;
+  customImage?: CustomImageConfig;
+}
+
+export interface CustomImageConfig {
+  url: string;
+  filename: string;
 }
 
 export interface AlbionItemConfig {

@@ -30,6 +30,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { CreateActionForm } from "@/components/create-action-form";
+import { SimpleActionForm } from "@/components/simple-action-form";
 import { useActions } from "@/hooks/useActions";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -37,6 +38,7 @@ import { toast } from "sonner";
 function ActionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showSimpleForm, setShowSimpleForm] = useState(false);
 
   const { actions, loading, error, refreshActions } = useActions();
 
@@ -72,6 +74,7 @@ function ActionsPage() {
 
   const handleActionCreated = () => {
     setShowCreateForm(false);
+    setShowSimpleForm(false);
     refreshActions();
   };
 
@@ -107,6 +110,17 @@ function ActionsPage() {
     );
   }
 
+  if (showSimpleForm) {
+    return (
+      <div className="flex flex-1 flex-col p-6">
+        <SimpleActionForm
+          onActionCreated={handleActionCreated}
+          onCancel={() => setShowSimpleForm(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-1 flex-col p-6">
       <div className="flex items-center justify-between mb-6">
@@ -116,10 +130,16 @@ function ActionsPage() {
             Manage stream actions that viewers can activate with Twitch bits
           </p>
         </div>
-        <Button onClick={() => setShowCreateForm(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Action
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowSimpleForm(true)} variant="default">
+            <Plus className="h-4 w-4 mr-2" />
+            Simple Action
+          </Button>
+          <Button onClick={() => setShowCreateForm(true)} variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Advanced Action
+          </Button>
+        </div>
       </div>
 
       <div className="relative mb-6">
@@ -138,10 +158,16 @@ function ActionsPage() {
             {searchTerm ? "No actions found" : "No actions created yet"}
           </div>
           {!searchTerm && (
-            <Button onClick={() => setShowCreateForm(true)} variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Create first action
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setShowSimpleForm(true)} variant="default">
+                <Plus className="h-4 w-4 mr-2" />
+                Simple Action
+              </Button>
+              <Button onClick={() => setShowCreateForm(true)} variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Advanced Action
+              </Button>
+            </div>
           )}
         </div>
       ) : (
@@ -164,7 +190,19 @@ function ActionsPage() {
                 <TableRow key={action.id}>
                   <TableCell>
                     <div className="flex items-center justify-center h-10 w-10 rounded-md bg-muted overflow-hidden">
-                      {action.config?.albionItem ? (
+                      {action.config?.customImage ? (
+                        <img
+                          src={action.config.customImage.url}
+                          alt={action.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = "none";
+                            const sibling = target.nextElementSibling as HTMLElement;
+                            if (sibling) sibling.style.display = "flex";
+                          }}
+                        />
+                      ) : action.config?.albionItem ? (
                         <img
                           src={action.config.albionItem.imageUrl}
                           alt={action.config.albionItem.name}
@@ -177,7 +215,7 @@ function ActionsPage() {
                           }}
                         />
                       ) : null}
-                      <div className={`text-lg flex items-center justify-center w-full h-full ${action.config?.albionItem ? "hidden" : "flex"}`}>
+                      <div className={`text-lg flex items-center justify-center w-full h-full ${(action.config?.customImage || action.config?.albionItem) ? "hidden" : "flex"}`}>
                         {action.config?.emoji || "⚡"}
                       </div>
                     </div>
@@ -214,6 +252,11 @@ function ActionsPage() {
                           ⚡ General
                         </Badge>
                       )}
+                      {action.type === "simple-action" && (
+                        <Badge variant="default" className="text-xs">
+                          ⚡ Simple
+                        </Badge>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
@@ -236,6 +279,11 @@ function ActionsPage() {
                       <div className="flex flex-col items-center">
                         <span className="text-sm font-medium">{action.config.duration}m</span>
                         <span className="text-xs text-muted-foreground">duration</span>
+                      </div>
+                    ) : action.type === "simple-action" && action.config?.timer ? (
+                      <div className="flex flex-col items-center">
+                        <span className="text-sm font-medium">{action.config.timer}s</span>
+                        <span className="text-xs text-muted-foreground">cooldown</span>
                       </div>
                     ) : (
                       <span className="text-muted-foreground text-sm">—</span>

@@ -13,6 +13,7 @@ import twitchRouter from "./routes/twitch";
 import webhooksRouter from "./routes/webhooks";
 import actionsRouter from "./routes/actions";
 import overlaysRouter from "./routes/overlays";
+import uploadRouter from "./routes/upload";
 import { testDatabaseConnection } from "./database/connection";
 import { desktopWS } from "./services/desktop-ws";
 
@@ -25,6 +26,9 @@ app.use(cors());
 app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files for uploads
+app.use("/uploads", express.static("uploads"));
 
 // Routes
 app.get("/health", (req, res) => {
@@ -55,6 +59,9 @@ app.use("/api/actions", actionsRouter);
 
 // Overlays API
 app.use("/api/overlays", overlaysRouter);
+
+// Upload API
+app.use("/api/upload", uploadRouter);
 
 // Create HTTP server
 const server = createServer(app);
