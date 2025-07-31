@@ -20,8 +20,13 @@ interface Action {
   config: {
     emoji: string;
     bitCost: number;
-    duration: number;
+    duration?: number;
+    timer?: number;
     albionItem?: AlbionItem;
+    customImage?: {
+      url: string;
+      filename: string;
+    };
   };
   isActive: boolean;
 }
@@ -58,18 +63,18 @@ export default function OverlayPage(): React.ReactElement {
   const [, setRecentEvents] = useState<TestEvent[]>([]);
   const [actionTimers, setActionTimers] = useState<Record<string, ActionTimer>>({});
 
-  // Execute keyboard action when clicked
-  const executeKeyboardAction = async (action: Action) => {
-    // Only execute if it's a keyboard action and not currently active (for blocking actions)
-    if (!["disable_skill", "press_key"].includes(action.type)) {
-      return;
-    }
-
+  // Execute action when clicked (now supports all action types)
+  const executeAction = async (action: Action) => {
     const timer = actionTimers[action.id];
+    
     // For blocking actions, don't execute if already active
-    // For press_key actions, allow execution even if on cooldown
     if (timer?.isActive && action.type === "disable_skill") {
       return; // Blocking action already active
+    }
+
+    // For simple actions, check cooldown
+    if (timer?.isActive && action.type === "simple-action") {
+      return; // Simple action on cooldown
     }
 
     try {
@@ -77,7 +82,7 @@ export default function OverlayPage(): React.ReactElement {
         triggeredBy: "overlay_click",
       });
 
-      console.log("Keyboard action executed from overlay:", response.data);
+      console.log("Action executed from overlay:", response.data);
 
       // Create a manual execution event to show in overlay
       const manualEvent = {
@@ -93,7 +98,7 @@ export default function OverlayPage(): React.ReactElement {
       processEvents([manualEvent]);
 
     } catch (error: any) {
-      console.error("Failed to execute keyboard action from overlay:", error);
+      console.error("Failed to execute action from overlay:", error);
     }
   };
 
@@ -201,10 +206,15 @@ export default function OverlayPage(): React.ReactElement {
           const action = actions.find(a => a.id === actionId);
           if (action && updated[actionId]) {
             const activatedAt = new Date(event.timestamp);
-            // Use seconds for keyboard actions, minutes for others
-            const durationMs = ["disable_skill", "press_key"].includes(action.type)
-              ? action.config.duration * 1000
-              : action.config.duration * 60 * 1000;
+            // Use seconds for keyboard actions and simple actions, minutes for others
+            let durationMs = 0;
+            if (["disable_skill", "press_key"].includes(action.type)) {
+              durationMs = (action.config.duration || 5) * 1000;
+            } else if (action.type === "simple-action") {
+              durationMs = (action.config.timer || 30) * 1000;
+            } else {
+              durationMs = (action.config.duration || 5) * 60 * 1000;
+            }
             const endsAt = new Date(activatedAt.getTime() + durationMs);
             const now = new Date();
             const remainingMs = endsAt.getTime() - now.getTime();
@@ -445,65 +455,88 @@ export default function OverlayPage(): React.ReactElement {
 
   return (
     <div className="min-h-screen bg-transparent p-4 flex justify-center flex-col">
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-white/60 text-lg font-light italic">
-          Overaction
+      {/* Medieval Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-amber-300 text-xl font-bold tracking-wider drop-shadow-lg" 
+             style={{ 
+               textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(255,193,7,0.3)',
+               fontFamily: 'serif' 
+             }}>
+          ⚔️ BITS ⚔️
         </div>
       </div>
+
+      {/* Medieval Success Notifications */}
       {triggeredActions.length > 0 && (
-        <div className="fixed top-4 right-4 space-y-2 z-50">
+        <div className="fixed top-4 right-4 space-y-3 z-50">
           {triggeredActions.map((action, index) => (
             <div
               key={`${action.id}-${action.triggeredAt.getTime()}`}
-              className="bg-green-600 rounded-lg p-2 flex items-center gap-2 animate-pulse border-2 border-green-400"
+              className="relative bg-gradient-to-r from-emerald-800 to-emerald-700 rounded-lg p-3 flex items-center gap-3 border-2 border-emerald-400 shadow-2xl"
               style={{
+                animation: `medievalPulse 2s ease-in-out, slideInRight 0.5s ease-out`,
                 animationDelay: `${index * 0.2}s`,
-                animationDuration: "2s",
+                boxShadow: '0 0 20px rgba(16, 185, 129, 0.4), inset 0 1px 2px rgba(255,255,255,0.1)'
               }}
             >
-              <div className="w-8 h-8 rounded-lg overflow-hidden bg-green-700 flex items-center justify-center">
-                {action.config.albionItem ? (
-                  <img
-                    src={getAlbionItemImageUrl(action.config.albionItem.uniqueName, action.config.albionItem.quality)}
-                    alt={action.config.albionItem.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = "none";
-                      const sibling = target.nextElementSibling as HTMLElement;
-                      if (sibling) sibling.style.display = "block";
-                    }}
-                  />
-                ) : null}
-                <div className={`text-sm ${action.config.albionItem ? "hidden" : "block"}`}>
-                  {action.config.emoji}
+              {/* Medieval frame for icon */}
+              <div className="relative w-10 h-10 bg-gradient-to-br from-amber-200 to-amber-400 rounded-full p-0.5 shadow-lg">
+                <div className="w-full h-full bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-full overflow-hidden flex items-center justify-center">
+                  {action.config.albionItem ? (
+                    <img
+                      src={getAlbionItemImageUrl(action.config.albionItem.uniqueName, action.config.albionItem.quality)}
+                      alt={action.config.albionItem.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.style.display = "none";
+                        const sibling = target.nextElementSibling as HTMLElement;
+                        if (sibling) sibling.style.display = "block";
+                      }}
+                    />
+                  ) : null}
+                  <div className={`text-lg ${action.config.albionItem ? "hidden" : "block"}`}>
+                    {action.config.emoji}
+                  </div>
                 </div>
               </div>
+              
               <div className="flex-1 min-w-0">
-                <div className="text-white text-xs font-bold truncate">
+                <div className="text-white text-sm font-bold truncate drop-shadow-md">
                   {action.name} ✓
                 </div>
-                <div className="text-green-200 text-xs">
-                  {action.bitsReceived} bits
+                <div className="text-emerald-200 text-xs font-semibold">
+                  {action.bitsReceived} bits donated
                 </div>
               </div>
+              
+              {/* Medieval corner decorations */}
+              <div className="absolute -top-1 -left-1 w-3 h-3 border-l-2 border-t-2 border-amber-300"></div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 border-r-2 border-t-2 border-amber-300"></div>
+              <div className="absolute -bottom-1 -left-1 w-3 h-3 border-l-2 border-b-2 border-amber-300"></div>
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 border-r-2 border-b-2 border-amber-300"></div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Minimal Floating Items */}
-      <div className="flex flex-col gap-4 max-w-[120px]">
-        {actions.map((action) => {
+      {/* Clean Action Items - Image Only */}
+      <div className="flex flex-col gap-4 max-w-[100px]">
+        {actions
+          .filter(action => action.config.customImage || action.config.albionItem) // Only show items with images
+          .map((action) => {
           const isTriggered = triggeredActions.some(ta => ta.id === action.id);
           const timer = actionTimers[action.id];
           const isActive = timer?.isActive || false;
           const remainingSeconds = timer?.remainingSeconds || 0;
           const isKeyboardAction = ["disable_skill", "press_key"].includes(action.type);
           const isBlockingAction = action.type === "disable_skill";
-          const canExecute = isKeyboardAction && (!isActive || !isBlockingAction);
+          const isSimpleAction = action.type === "simple-action";
+          const canExecute = (isKeyboardAction && (!isActive || !isBlockingAction)) || (isSimpleAction && !isActive);
+          
+          const hasCustomImage = action.config.customImage;
+          const hasAlbionItem = action.config.albionItem;
 
-          // Format remaining time as MM:SS
           const formatTime = (seconds: number): string => {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
@@ -513,74 +546,79 @@ export default function OverlayPage(): React.ReactElement {
           return (
             <div
               key={action.id}
-              className={`relative flex flex-col items-center ${canExecute ? "cursor-pointer hover:scale-105 transition-transform" : ""}`}
-              onClick={() => canExecute && executeKeyboardAction(action)}
+              className={`relative flex flex-col items-center ${canExecute ? "cursor-pointer" : ""}`}
+              onClick={() => canExecute && executeAction(action)}
+              style={{
+                animation: isTriggered ? 'medievalGlow 2s ease-in-out' : '',
+                transition: 'all 0.3s ease'
+              }}
             >
-              {/* Main Item Image */}
-              <div className={`${
-                isActive ? "ring-4 ring-red-400 bg-red-800" :
-                  isTriggered ? "ring-4 ring-green-400 bg-green-800" :
-                    canExecute ? "ring-2 ring-blue-400/50 bg-blue-900/20 hover:ring-blue-400" :
-                      "ring-2 ring-white/20 bg-black/20"
-              } w-16 h-16 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 relative group ${canExecute ? "hover:scale-110" : ""}`}>
-                {action.config.albionItem ? (
-                  <img
-                    src={getAlbionItemImageUrl(action.config.albionItem.uniqueName, action.config.albionItem.quality)}
-                    alt={action.config.albionItem.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = "none";
-                      const sibling = target.nextElementSibling as HTMLElement;
-                      if (sibling) sibling.style.display = "flex";
-                    }}
-                  />
-                ) : null}
-                <div className={`w-full h-full flex items-center justify-center text-xl ${!action.config.albionItem ? "flex" : "hidden"}`}>
-                  {action.config.emoji}
+              {/* Pure Image - No Background */}
+              <div className="relative">
+                <div className={`w-20 h-20 rounded-xl overflow-hidden transition-all duration-300 ${
+                  canExecute ? 'hover:scale-105' : ''
+                }`}>
+                  {hasCustomImage ? (
+                    <img
+                      src={action.config.customImage!.url}
+                      alt={action.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : hasAlbionItem ? (
+                    <img
+                      src={getAlbionItemImageUrl(action.config.albionItem.uniqueName, action.config.albionItem.quality)}
+                      alt={action.config.albionItem.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : null}
+
+                  {/* Timer Overlay - Minimal */}
+                  {isActive && (
+                    <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center rounded-xl">
+                      <div className="text-white text-sm font-bold drop-shadow-lg">
+                        {formatTime(remainingSeconds)}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Timer Overlay */}
-                {isActive && (
-                  <div className="absolute inset-0 bg-red-900/80 flex flex-col items-center justify-center">
-                    <div className="text-white text-xs font-bold">
-                      {formatTime(remainingSeconds)}
-                    </div>
-                  </div>
-                )}
-
-                {/* Keyboard Action Indicator */}
-                {canExecute && (
-                  <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                    ⚡
-                  </div>
-                )}
+                {/* Status indicator - Clean circle */}
+                <div className={`absolute bottom-[13px] right-[12px] w-4 h-4 rounded-full shadow-lg transition-all duration-300 opacity-50 ${
+                  isActive ? 'bg-red-500' : canExecute ? 'bg-green-500' : 'bg-gray-500'
+                }`}></div>
               </div>
 
-              {/* Compact Info */}
-              <div className="mt-2 text-center">
-                <div className="text-white text-xs font-bold truncate max-w-[100px] drop-shadow-lg">
-                  {action.name}
+              {/* Bits count - Clean styling */}
+              <div className="absolute bottom-0 left-0 z-10">
+                <div className="bg-amber-600 text-white text-sm font-bold px-2 py-1 rounded-lg shadow-lg">
+                  {action.config.bitCost}
                 </div>
-                {isActive && timer?.triggeredBy && (
-                  <div className="text-red-300 text-xs font-medium">
+              </div>
+
+              {/* Timer info when active */}
+              {isActive && timer?.triggeredBy && (
+                <div className="mt-2 text-center">
+                  <div className="text-red-400 text-xs font-medium drop-shadow-lg">
                     by {timer.triggeredBy}
                   </div>
-                )}
-                {!isActive && (
-                  <div className="text-yellow-400 text-xs font-bold">
-                    {action.config.bitCost} bits
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
 
-              {/* Simple Timer Bar */}
+              {/* Progress Bar - Clean */}
               {isActive && (
-                <div className="w-full h-1 bg-black/30 rounded-full mt-1 overflow-hidden">
+                <div className="absolute -bottom-4 left-0 right-0 h-2 bg-gray-700 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-red-400 transition-all duration-1000 ease-out"
+                    className="h-full bg-red-500 transition-all duration-1000 ease-out"
                     style={{
-                      width: `${Math.max(0, (remainingSeconds / (isBlockingAction ? action.config.duration : action.config.duration * 60)) * 100)}%`,
+                      width: `${Math.max(0, (() => {
+                        if (isBlockingAction) {
+                          return (remainingSeconds / (action.config.duration || 5)) * 100;
+                        } else if (isSimpleAction) {
+                          return (remainingSeconds / (action.config.timer || 30)) * 100;
+                        } else {
+                          return (remainingSeconds / ((action.config.duration || 5) * 60)) * 100;
+                        }
+                      })())}%`
                     }}
                   />
                 </div>
@@ -589,6 +627,40 @@ export default function OverlayPage(): React.ReactElement {
           );
         })}
       </div>
+
+      {/* Medieval CSS Animations */}
+      <style jsx>{`
+        @keyframes medievalPulse {
+          0%, 100% { 
+            transform: scale(1); 
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+          }
+          50% { 
+            transform: scale(1.05); 
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+          }
+        }
+        
+        @keyframes slideInRight {
+          0% {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          100% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes medievalGlow {
+          0%, 100% { 
+            filter: brightness(1) drop-shadow(0 0 8px rgba(16, 185, 129, 0.3));
+          }
+          50% { 
+            filter: brightness(1.2) drop-shadow(0 0 16px rgba(16, 185, 129, 0.6));
+          }
+        }
+      `}</style>
 
       {/* Debug Info (remove in production) */}
       {/* <div className="fixed bottom-4 left-4 bg-black/90 text-white text-xs p-3 rounded max-w-sm space-y-1 max-h-96 overflow-y-auto">
