@@ -63,18 +63,13 @@ export default function OverlayPage(): React.ReactElement {
   const [, setRecentEvents] = useState<TestEvent[]>([]);
   const [actionTimers, setActionTimers] = useState<Record<string, ActionTimer>>({});
 
-  // Execute action when clicked (now supports all action types)
+  // Execute action when clicked (standardized for all action types)
   const executeAction = async (action: Action) => {
     const timer = actionTimers[action.id];
     
-    // For blocking actions, don't execute if already active
-    if (timer?.isActive && action.type === "disable_skill") {
-      return; // Blocking action already active
-    }
-
-    // For simple actions, check cooldown
-    if (timer?.isActive && action.type === "simple-action") {
-      return; // Simple action on cooldown
+    // Don't execute if already active (treat all types the same as press_key)
+    if (timer?.isActive) {
+      return; // Action already active or on cooldown
     }
 
     try {
@@ -206,14 +201,14 @@ export default function OverlayPage(): React.ReactElement {
           const action = actions.find(a => a.id === actionId);
           if (action && updated[actionId]) {
             const activatedAt = new Date(event.timestamp);
-            // Use seconds for keyboard actions and simple actions, minutes for others
+            // Standardize duration calculation for all action types (like press_key)
             let durationMs = 0;
-            if (["disable_skill", "press_key"].includes(action.type)) {
-              durationMs = (action.config.duration || 5) * 1000;
-            } else if (action.type === "simple-action") {
-              durationMs = (action.config.timer || 30) * 1000;
+            if (action.config.duration) {
+              durationMs = action.config.duration * 1000; // Use seconds for all
+            } else if (action.config.timer) {
+              durationMs = action.config.timer * 1000; // Use seconds for all
             } else {
-              durationMs = (action.config.duration || 5) * 60 * 1000;
+              durationMs = 5 * 1000; // Default 5 seconds for all
             }
             const endsAt = new Date(activatedAt.getTime() + durationMs);
             const now = new Date();
@@ -529,10 +524,8 @@ export default function OverlayPage(): React.ReactElement {
           const timer = actionTimers[action.id];
           const isActive = timer?.isActive || false;
           const remainingSeconds = timer?.remainingSeconds || 0;
-          const isKeyboardAction = ["disable_skill", "press_key"].includes(action.type);
-          const isBlockingAction = action.type === "disable_skill";
-          const isSimpleAction = action.type === "simple-action";
-          const canExecute = (isKeyboardAction && (!isActive || !isBlockingAction)) || (isSimpleAction && !isActive);
+          // Treat all action types the same way as press_key
+          const canExecute = !isActive;
           
           const hasCustomImage = action.config.customImage;
           const hasAlbionItem = action.config.albionItem;
@@ -546,7 +539,7 @@ export default function OverlayPage(): React.ReactElement {
           return (
             <div
               key={action.id}
-              className={`relative flex flex-col items-center ${canExecute ? "cursor-pointer" : ""}`}
+              className={`relative flex flex-col items-center mt-4 ${canExecute ? "cursor-pointer" : ""}`}
               onClick={() => canExecute && executeAction(action)}
               style={{
                 animation: isTriggered ? 'medievalGlow 2s ease-in-out' : '',
@@ -564,7 +557,7 @@ export default function OverlayPage(): React.ReactElement {
                       alt={action.name}
                       className="w-full h-full object-cover"
                     />
-                  ) : hasAlbionItem ? (
+                  ) : hasAlbionItem && action.config.albionItem ? (
                     <img
                       src={getAlbionItemImageUrl(action.config.albionItem.uniqueName, action.config.albionItem.quality)}
                       alt={action.config.albionItem.name}
@@ -589,7 +582,7 @@ export default function OverlayPage(): React.ReactElement {
               </div>
 
               {/* Bits count - Clean styling */}
-              <div className="absolute bottom-0 left-0 z-10">
+              <div className="absolute -top-2 left-0 z-10">
                 <div className="bg-amber-600 text-white text-sm font-bold px-2 py-1 rounded-lg shadow-lg">
                   {action.config.bitCost}
                 </div>
@@ -611,12 +604,13 @@ export default function OverlayPage(): React.ReactElement {
                     className="h-full bg-red-500 transition-all duration-1000 ease-out"
                     style={{
                       width: `${Math.max(0, (() => {
-                        if (isBlockingAction) {
-                          return (remainingSeconds / (action.config.duration || 5)) * 100;
-                        } else if (isSimpleAction) {
-                          return (remainingSeconds / (action.config.timer || 30)) * 100;
+                        // Standardize all action types to use same duration calculation as press_key
+                        if (action.config.duration) {
+                          return (remainingSeconds / action.config.duration) * 100;
+                        } else if (action.config.timer) {
+                          return (remainingSeconds / action.config.timer) * 100;
                         } else {
-                          return (remainingSeconds / ((action.config.duration || 5) * 60)) * 100;
+                          return (remainingSeconds / 5) * 100; // Default 5 seconds
                         }
                       })())}%`
                     }}
@@ -628,8 +622,8 @@ export default function OverlayPage(): React.ReactElement {
         })}
       </div>
 
-      {/* Medieval CSS Animations */}
-      <style jsx>{`
+      {/* CSS Animations */}
+      <style>{`
         @keyframes medievalPulse {
           0%, 100% { 
             transform: scale(1); 
